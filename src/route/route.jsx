@@ -12,6 +12,10 @@ import HomePage from "../pages/homePage";
 import Login from "../pages/login";
 import Register from "../pages/Register";
 import StaffPage from "../pages/Staff/StaffPage";
+import BlogPage from "../pages/BlogPage";
+import CreateBlog from "../pages/Admin/CreateBlog ";
+import BlogList from "../components/BlogList";
+import BlogDetail from "../components/BlogDetail";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -21,6 +25,16 @@ export const routes = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "/blog",
+        element: <BlogList />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/blog/:id",
+        element: <BlogDetail />,
+        ErrorPage: <ErrorPage />
       },
       {
         path: "/login",
@@ -61,6 +75,14 @@ export const routes = createBrowserRouter([
       {
         path: "users",
         element: <ManagerUser />,
+      },
+      {
+        path: "create-blog",
+        element: <CreateBlog />,
+      },
+      {
+        path: "create-blog",
+        element: <CreateBlog />,
       },
     ],
   },
