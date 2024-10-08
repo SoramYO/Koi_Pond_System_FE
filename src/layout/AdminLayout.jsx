@@ -11,6 +11,8 @@ const AdminLayout = () => {
                     <a href="/admin" className="block py-2 px-4 text-gray-600 hover:bg-gray-200">Dashboard</a>
                     <a href="/admin/users" className="block py-2 px-4 text-gray-600 hover:bg-gray-200">Users</a>
                     <a href="/admin/projects" className="block py-2 px-4 text-gray-600 hover:bg-gray-200">Projects</a>
+                    <a href="/admin/create-blog" className="block py-2 px-4 text-gray-600 hover:bg-gray-200">Blog</a>
+
                     {/* Add more admin navigation items as needed */}
                 </nav>
             </aside>

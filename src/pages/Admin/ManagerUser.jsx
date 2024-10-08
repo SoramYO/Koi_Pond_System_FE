@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const ManagerUser = () => {
+  const [form] = Form.useForm();
+  const [id, setId] = useState(1);  // Initialize ID starting from 1
   const [users, setUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -26,8 +28,40 @@ const ManagerUser = () => {
       );
       console.log(response.data.accounts);
       setUsers(response.data.accounts);
+
+      // Get the highest user ID from the existing users and set the next ID
+      const maxId = response.data.accounts.length > 0
+        ? Math.max(...response.data.accounts.map(u => u.id))
+        : 0;
+      setId(maxId + 1);  // Set the next ID as maxId + 1
     } catch (error) {
       toast.error("Failed to fetch users");
+    }
+  };
+
+  const handleSubmit = (values) => {
+    console.log("Form Submitted:", values);
+    form.resetFields();  // Reset the form after submission
+  };
+
+  const handleAddUser = async (values) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const newUser = { ...values, id };  // Assign the new ID to the user
+
+      await axios.post("http://localhost:5222/api/v1/users", newUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success("User added successfully");
+
+      // After adding the user, increment the ID for the next user
+      setId(id + 1);
+      fetchUsers();
+      setIsModalVisible(false);
+    } catch (error) {
+      toast.error("Failed to add user");
     }
   };
 
@@ -38,13 +72,13 @@ const ManagerUser = () => {
 
   const handleDelete = async (userId) => {
     try {
-      const user = JSON.parse(localStorage.getItem("user")); // Lấy và phân tích cú pháp JSON
-      const token = user.accessToken; // Lấy accessToken từ đối tượng
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user.accessToken;
       await axios.delete(
         `http://localhost:5222/api/v1/account-manager/account/${userId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -55,33 +89,11 @@ const ManagerUser = () => {
     }
   };
 
-  const handleModalOk = async (values) => {
-    try {
-      const token = localStorage.getItem("accessToken"); // Lấy token từ local storage
-      if (editingUser) {
-        await axios.put(
-          `http://localhost:5222/api/v1/users/${editingUser.id}`,
-          values,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Thêm token vào header
-            },
-          }
-        );
-        toast.success("User updated successfully");
-      } else {
-        await axios.post("http://localhost:5222/api/v1/users", values, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        });
-        toast.success("User added successfully");
-      }
-      fetchUsers();
-      setIsModalVisible(false);
-      setEditingUser(null);
-    } catch (error) {
-      toast.error("Failed to save user");
+  const handleModalOk = (values) => {
+    if (editingUser) {
+      handleEditUser(values);
+    } else {
+      handleAddUser(values);
     }
   };
 
@@ -90,10 +102,38 @@ const ManagerUser = () => {
     setEditingUser(null);
   };
 
+  const handleEditUser = async (values) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.put(
+        `http://localhost:5222/api/v1/users/${editingUser.id}`,
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("User updated successfully");
+      fetchUsers();
+      setIsModalVisible(false);
+      setEditingUser(null);
+    } catch (error) {
+      toast.error("Failed to update user");
+    }
+  };
+
   const columns = [
-    { title: "Username", dataIndex: "userName", key: "userName" },
+    { title: "Id", dataIndex: "id", key: "id" },
+    { title: "UserName", dataIndex: "userName", key: "userName" },
+    { title: "FirstName", dataIndex: "firstName", key: "firstName" },
+    { title: "LastName", dataIndex: "lastName", key: "lastName" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Role", dataIndex: "role", key: "role" },
+    { title: "Phone", dataIndex: "phone", key: "phone" },
+    { title: "Birthday", dataIndex: "birthday", key: "birthday" },
+    { title: "Gender", dataIndex: "gender", key: "gender" },
+    { title: "Role", dataIndex: "roleName", key: "roleName" },
+    { title: "Status", dataIndex: "status", key: "status" },
     {
       title: "Action",
       key: "action",
@@ -123,12 +163,27 @@ const ManagerUser = () => {
         footer={null}
       >
         <Form
-          initialValues={editingUser || { userName: "", email: "", role: "" }}
+          form={form}
+          initialValues={editingUser || { id: "", userName: "", firstName: "", lastName: "", email: "", phone: "", birthday: "", gender: "", roleName: "", status: "" }}
           onFinish={handleModalOk}
         >
           <Form.Item
             name="userName"
             label="Username"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="firstName"
+            label="Firstname"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="lastName"
+            label="Lastname"
             rules={[{ required: true }]}
           >
             <Input />
@@ -140,7 +195,39 @@ const ManagerUser = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="Role" rules={[{ required: true }]}>
+          <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="birthday"
+            label="Birthday"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="roleName"
+            label="Role"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item>
