@@ -15,7 +15,7 @@ const BlogList = () => {
             <div
                 className="bg-cover bg-center min-h-screen"
                 style={{
-                    backgroundImage: `url('https://images.unsplash.com/photo-1728343070556-9ad9acca28cb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+                    backgroundImage: `url('https://plus.unsplash.com/premium_photo-1663948060611-4168fe397a7a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
                 }}
             ></div>
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Blog List</h2>
