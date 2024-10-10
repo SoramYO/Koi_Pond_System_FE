@@ -1,50 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar'; 
-import './StaffPage.css'; 
-import { useState } from 'react';
-import ChatIcon from '../Chat/ChatIcon';
-import ChatModal from '../Chat/ChatModal';
+import Sidebar from './Sidebar';
+
+import ChatSidebar from './ChatSidebar'; 
+import './StaffPage.css';
 
 const StaffPage = () => {
   const navigate = useNavigate();
 
+ 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [currentCustomerId, setCurrentCustomerId] = useState(null);
+
+
+  const customers = [
+    { id: '002', name: 'Customer A' },
+    { id: '003', name: 'Customer B' },
+    { id: '004', name: 'Customer C' },
+  ];
+
+  
   const handleLogout = () => {
     navigate('/login');
   };
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const handleChatOpen = () => setIsChatOpen(true);
-  const handleChatClose = () => setIsChatOpen(false);
+  
+  const handleChatOpen = () => setIsSidebarOpen(true);
+  const handleChatClose = () => setIsSidebarOpen(false);
+
+
+  const handleSelectCustomer = (customerId) => {
+    setCurrentCustomerId(customerId);
+    setIsChatOpen(true); 
+    setIsSidebarOpen(false); 
+  };
+
+  
+  const handleCloseChatModal = () => {
+    setIsChatOpen(false);
+    setCurrentCustomerId(null);
+  };
 
   return (
     <div className="staff-page">
-
       <div className="top-bar">
         <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </div>
 
-      
       <div className="layout">
-     
-        <Sidebar />
-
        
-        <div className="content">
-          <h1>Welcome to the Staff Dashboard</h1>
-          <ChatIcon onClick={handleChatOpen} />
-      
-      <ChatModal
-        isOpen={isChatOpen}
-        onClose={handleChatClose}
-        userEmail={localStorage.getItem('userEmail')}
-        userRole="staff"
-      />
-         
-         
-        </div>
+        <Sidebar />
       </div>
     </div>
   );
