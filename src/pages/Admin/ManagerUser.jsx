@@ -1,11 +1,15 @@
-import { Button, Form, Input, Modal, Table } from "antd";
+import { Button, Form, Input, Modal, Table, Row, Col, Space, Select, DatePicker, Radio } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { EditOutlined, DeleteOutlined, UserAddOutlined } from "@ant-design/icons";
+import moment from "moment";
+
+const { Option } = Select;
 
 const ManagerUser = () => {
   const [form] = Form.useForm();
-  const [id, setId] = useState(1);  // Initialize ID starting from 1
+  const [id, setId] = useState(1);
   const [users, setUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -26,28 +30,26 @@ const ManagerUser = () => {
           },
         }
       );
-      console.log(response.data.accounts);
       setUsers(response.data.accounts);
 
-      // Get the highest user ID from the existing users and set the next ID
-      const maxId = response.data.accounts.length > 0
-        ? Math.max(...response.data.accounts.map(u => u.id))
-        : 0;
-      setId(maxId + 1);  // Set the next ID as maxId + 1
+      const maxId =
+        response.data.accounts.length > 0
+          ? Math.max(...response.data.accounts.map((u) => u.id))
+          : 0;
+      setId(maxId + 1);
     } catch (error) {
       toast.error("Failed to fetch users");
     }
   };
 
   const handleSubmit = (values) => {
-    console.log("Form Submitted:", values);
-    form.resetFields();  // Reset the form after submission
+    form.resetFields();
   };
 
   const handleAddUser = async (values) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const newUser = { ...values, id };  // Assign the new ID to the user
+      const newUser = { ...values, id };
 
       await axios.post("http://localhost:5222/api/v1/users", newUser, {
         headers: {
@@ -56,7 +58,6 @@ const ManagerUser = () => {
       });
       toast.success("User added successfully");
 
-      // After adding the user, increment the ID for the next user
       setId(id + 1);
       fetchUsers();
       setIsModalVisible(false);
@@ -125,9 +126,9 @@ const ManagerUser = () => {
 
   const columns = [
     { title: "Id", dataIndex: "id", key: "id" },
-    { title: "UserName", dataIndex: "userName", key: "userName" },
-    { title: "FirstName", dataIndex: "firstName", key: "firstName" },
-    { title: "LastName", dataIndex: "lastName", key: "lastName" },
+    { title: "Username", dataIndex: "userName", key: "userName" },
+    { title: "First Name", dataIndex: "firstName", key: "firstName" },
+    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Phone", dataIndex: "phone", key: "phone" },
     { title: "Birthday", dataIndex: "birthday", key: "birthday" },
@@ -138,23 +139,45 @@ const ManagerUser = () => {
       title: "Action",
       key: "action",
       render: (text, record) => (
-        <>
-          <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Button onClick={() => handleDelete(record.id)} danger>
+        <Space size="middle">
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            danger
+          >
             Delete
           </Button>
-        </>
+        </Space>
       ),
     },
   ];
 
   return (
     <div>
-      <h1>Manage Users</h1>
-      <Button type="primary" onClick={() => setIsModalVisible(true)}>
-        Add User
-      </Button>
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Row justify="space-between" align="middle" style={{ marginBottom: "20px" }}>
+        <Col>
+          <h1>Manage Users</h1>
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={() => setIsModalVisible(true)}
+          >
+            Add User
+          </Button>
+        </Col>
+      </Row>
+
+      <Table
+        dataSource={users}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 5 }}
+      />
 
       <Modal
         title={editingUser ? "Edit User" : "Add User"}
@@ -164,74 +187,60 @@ const ManagerUser = () => {
       >
         <Form
           form={form}
-          initialValues={editingUser || { id: "", userName: "", firstName: "", lastName: "", email: "", phone: "", birthday: "", gender: "", roleName: "", status: "" }}
+          initialValues={
+            editingUser
+              ? { ...editingUser, birthday: moment(editingUser.birthday) }
+              : { id: "", userName: "", firstName: "", lastName: "", email: "", phone: "", birthday: "", gender: "", roleName: "", status: "" }
+          }
           onFinish={handleModalOk}
+          layout="vertical"
         >
-          <Form.Item
-            name="userName"
-            label="Username"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="userName" label="Username" rules={[{ required: true, message: "Please input the username!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item
-            name="firstName"
-            label="Firstname"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: "Please input the first name!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item
-            name="lastName"
-            label="Lastname"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please input the last name!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[{ required: true, type: "email" }]}
-          >
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email", message: "Please input a valid email!" }]}>
             <Input />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Phone"
-            rules={[{ required: true }]}
+            label="Phone (10 numbers)"
+            rules={[
+              { required: true, message: "Please input the phone number!" },
+              { pattern: /^[0-9]{10}$/, message: "Phone number must be exactly 10 digits!" },
+            ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="birthday"
-            label="Birthday"
-            rules={[{ required: true }]}
-          >
-            <Input />
+          <Form.Item name="birthday" label="Birthday" rules={[{ required: true, message: "Please input the birthday!" }]}>
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item
-            name="gender"
-            label="Gender"
-            rules={[{ required: true }]}
-          >
-            <Input />
+          <Form.Item name="gender" label="Gender" rules={[{ required: true, message: "Please select gender!" }]}>
+            <Select>
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+            </Select>
           </Form.Item>
-          <Form.Item
-            name="roleName"
-            label="Role"
-            rules={[{ required: true }]}
-          >
-            <Input />
+          <Form.Item name="roleName" label="Role" rules={[{ required: true, message: "Please input the role!" }]}>
+            <Select>
+              <Option value="male">Admin</Option>
+              <Option value="female">Satff</Option>
+              <Option value="female">Customer</Option>
+            </Select>
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Status"
-            rules={[{ required: true }]}
-          >
-            <Input />
+          <Form.Item name="status" label="Status" rules={[{ required: true, message: "Please select the status!" }]}>
+            <Radio.Group>
+              <Radio value="active">Active</Radio>
+              <Radio value="inactive">Inactive</Radio>
+            </Radio.Group>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" block>
               {editingUser ? "Update" : "Add"}
             </Button>
           </Form.Item>
