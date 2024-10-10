@@ -5,8 +5,7 @@ import Background3 from "../assets/images/bg-3.jpg";
 import Background2 from "../assets/images/bg2.jpg";
 import Background from "../assets/images/project1-2.jpg";
 import ChatIcon from "./Chat/ChatIcon";
-import ChatModal from "./Chat/ChatModal";
-
+import ChatFirebaseLogin from "./Chat/ChatFirebaseLogin";
 const Hero = () => (
   <section
     className="mb-10 flex justify-center w-full hero bg-medium h-[32rem] backdrop-blur-3xl"
@@ -186,25 +185,26 @@ function HomePage() {
 
   return (
     <main>
-      <Hero />
-      <div className="flex flex-col md:flex-row gap-6 ">
-        <Sidebar
-          isListOpen={isListOpen}
-          toggleList={toggleList}
-          isDichVuOpen={isDichVuOpen}
-        />
-        <MainContent />
+    <Hero />
+    <div className="flex flex-col md:flex-row gap-6 ">
+      <Sidebar
+        isListOpen={isListOpen}
+        toggleList={toggleList}
+        isDichVuOpen={isDichVuOpen}
+      />
+      <MainContent />
 
-        <ChatIcon onClick={handleChatOpen} />
+     
+      <ChatIcon onClick={handleChatOpen} />
 
-        <ChatModal
+      {isChatOpen && (
+        <ChatFirebaseLogin
           isOpen={isChatOpen}
           onClose={handleChatClose}
-          userEmail={localStorage.getItem("userEmail")}
-          userRole="staff"
         />
-      </div>
-    </main>
+      )}
+    </div>
+  </main>
   );
 }
 

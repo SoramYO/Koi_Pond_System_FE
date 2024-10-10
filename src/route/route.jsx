@@ -6,7 +6,8 @@ import AboutUs from "../pages/AboutUs";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManagerUser from "../pages/Admin/ManagerUser";
 import ChangePassword from "../pages/changePassword";
-import ChatModal from "../pages/Chat/ChatModal";
+import ChatFirebaseLogin from "../pages/Chat/ChatFirebaseLogin";
+import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
@@ -87,13 +88,18 @@ export const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/chat",
-    element: <ChatModal />,
+    path: "/chatwindow",
+    element: <ChatWindow />,
     errorElement: <ErrorPage />,
   },
   {
     path: "/staff",
     element: <StaffPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/chatfirebaselogin",
+    element: <ChatFirebaseLogin />,
     errorElement: <ErrorPage />,
   },
 ]);

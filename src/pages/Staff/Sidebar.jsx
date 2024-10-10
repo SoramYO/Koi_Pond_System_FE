@@ -14,6 +14,9 @@ function Sidebar() {
         <li>
           <Link to="/assign-construction">Assign Construction</Link>
         </li>
+        <li>
+          <Link to="/chatfirebaselogin">Chat</Link>
+        </li>
       </ul>
     </div>
   );
