@@ -1,14 +1,16 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import logo from "../assets/images/logo.png";
+import Loading from "../components/Loading";
 import { AuthContext } from "../context/authContext";
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
     userName: "",
     password: "",
   });
+  const [isLoading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { loading, error, dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     dispatch({ type: "LOGIN_START" });
     try {
       const res = await axios.post(
@@ -41,12 +44,17 @@ const LoginPage = () => {
         type: "LOGIN_FAILURE",
         payload: "Đăng nhập thất bại",
       });
-      toast.error(err.response.data.Message[0].DescriptionError || "Đăng nhập thất bại");
+      toast.error(
+        err.response.data.Message[0].DescriptionError || "Đăng nhập thất bại"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {isLoading && <Loading />}
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <img className="mx-auto h-24 w-auto" src={logo} alt="SGL Logo" />

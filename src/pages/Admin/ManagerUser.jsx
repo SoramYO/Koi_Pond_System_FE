@@ -1,9 +1,22 @@
-import { Button, Form, Input, Modal, Table, Row, Col, Space, Select, DatePicker, Radio } from "antd";
-import axios from "axios";
+import { EditOutlined, UserAddOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+} from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { EditOutlined, DeleteOutlined, UserAddOutlined } from "@ant-design/icons";
-import moment from "moment";
+import axiosInstance from "../../Axios/axiosInstance";
+import Loading from "../../components/Loading";
 
 const { Option } = Select;
 
@@ -13,25 +26,18 @@ const ManagerUser = () => {
   const [users, setUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
+    setIsLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const token = user.accessToken;
-      const response = await axios.get(
-        "http://localhost:5222/api/v1/account-manager/accounts",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosInstance.get("/account-manager/accounts");
       setUsers(response.data.accounts);
-
+      console.log(response.data.accounts);
       const maxId =
         response.data.accounts.length > 0
           ? Math.max(...response.data.accounts.map((u) => u.id))
@@ -39,6 +45,8 @@ const ManagerUser = () => {
       setId(maxId + 1);
     } catch (error) {
       toast.error("Failed to fetch users");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,15 +55,11 @@ const ManagerUser = () => {
   };
 
   const handleAddUser = async (values) => {
+    setIsLoading(true);
     try {
-      const token = localStorage.getItem("accessToken");
       const newUser = { ...values, id };
 
-      await axios.post("http://localhost:5222/api/v1/users", newUser, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axiosInstance.post("/users", newUser);
       toast.success("User added successfully");
 
       setId(id + 1);
@@ -63,30 +67,8 @@ const ManagerUser = () => {
       setIsModalVisible(false);
     } catch (error) {
       toast.error("Failed to add user");
-    }
-  };
-
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (userId) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const token = user.accessToken;
-      await axios.delete(
-        `http://localhost:5222/api/v1/account-manager/account/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success("User deleted successfully");
-      fetchUsers();
-    } catch (error) {
-      toast.error("Failed to delete user");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -98,22 +80,30 @@ const ManagerUser = () => {
     }
   };
 
+  const handleAddUserClick = () => {
+    form.resetFields();
+    setEditingUser(null);
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (user) => {
+    form.setFieldsValue({ ...user, birthday: moment(user.birthday) });
+    setEditingUser(user);
+    setIsModalVisible(true);
+  };
+
   const handleModalCancel = () => {
+    form.resetFields();
     setIsModalVisible(false);
     setEditingUser(null);
   };
 
   const handleEditUser = async (values) => {
+    setIsLoading(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.put(
-        `http://localhost:5222/api/v1/users/${editingUser.id}`,
-        values,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      await axiosInstance.put(
+        `/account-manager/users/${editingUser.id}`,
+        values
       );
       toast.success("User updated successfully");
       fetchUsers();
@@ -121,6 +111,22 @@ const ManagerUser = () => {
       setEditingUser(null);
     } catch (error) {
       toast.error("Failed to update user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleStatusChange = async (username) => {
+    setIsLoading(true);
+    try {
+      const respone = await axiosInstance.put(
+        `/account-manager/users/${username}/status`
+      );
+      toast.success(respone.data);
+      fetchUsers();
+    } catch (error) {
+      toast.error("Failed to update status");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,7 +140,17 @@ const ManagerUser = () => {
     { title: "Birthday", dataIndex: "birthday", key: "birthday" },
     { title: "Gender", dataIndex: "gender", key: "gender" },
     { title: "Role", dataIndex: "roleName", key: "roleName" },
-    { title: "Status", dataIndex: "status", key: "status" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) => (
+        <Switch
+          checked={status === true}
+          onChange={(checked) => handleStatusChange(record.userName)}
+        />
+      ),
+    },
     {
       title: "Action",
       key: "action",
@@ -143,13 +159,6 @@ const ManagerUser = () => {
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             Edit
           </Button>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-            danger
-          >
-            Delete
-          </Button>
         </Space>
       ),
     },
@@ -157,7 +166,12 @@ const ManagerUser = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: "20px" }}>
+      {isLoading && <Loading />}
+      <Row
+        justify="space-between"
+        align="middle"
+        style={{ marginBottom: "20px" }}
+      >
         <Col>
           <h1>Manage Users</h1>
         </Col>
@@ -165,7 +179,7 @@ const ManagerUser = () => {
           <Button
             type="primary"
             icon={<UserAddOutlined />}
-            onClick={() => setIsModalVisible(true)}
+            onClick={handleAddUserClick}
           >
             Add User
           </Button>
@@ -190,55 +204,148 @@ const ManagerUser = () => {
           initialValues={
             editingUser
               ? { ...editingUser, birthday: moment(editingUser.birthday) }
-              : { id: "", userName: "", firstName: "", lastName: "", email: "", phone: "", birthday: "", gender: "", roleName: "", status: "" }
+              : {}
           }
           onFinish={handleModalOk}
           layout="vertical"
         >
-          <Form.Item name="userName" label="Username" rules={[{ required: true, message: "Please input the username!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: "Please input the first name!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please input the last name!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email", message: "Please input a valid email!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="phone"
-            label="Phone (10 numbers)"
-            rules={[
-              { required: true, message: "Please input the phone number!" },
-              { pattern: /^[0-9]{10}$/, message: "Phone number must be exactly 10 digits!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="birthday" label="Birthday" rules={[{ required: true, message: "Please input the birthday!" }]}>
-            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="gender" label="Gender" rules={[{ required: true, message: "Please select gender!" }]}>
-            <Select>
-              <Option value="male">Male</Option>
-              <Option value="female">Female</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="roleName" label="Role" rules={[{ required: true, message: "Please input the role!" }]}>
-            <Select>
-              <Option value="male">Admin</Option>
-              <Option value="female">Satff</Option>
-              <Option value="female">Customer</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="status" label="Status" rules={[{ required: true, message: "Please select the status!" }]}>
-            <Radio.Group>
-              <Radio value="active">Active</Radio>
-              <Radio value="inactive">Inactive</Radio>
-            </Radio.Group>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="userName"
+                label="Username"
+                rules={[
+                  { required: true, message: "Please input the username!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="firstName"
+                label="First Name"
+                rules={[
+                  { required: true, message: "Please input the first name!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="lastName"
+                label="Last Name"
+                rules={[
+                  { required: true, message: "Please input the last name!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    type: "email",
+                    message: "Please input a valid email!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="phone"
+                label="Phone (10 digits)"
+                rules={[
+                  { required: true, message: "Please input the phone number!" },
+                  {
+                    pattern: /^[0-9]{10}$/,
+                    message: "Phone number must be exactly 10 digits!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            {editingUser ? null : (
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="password"
+                  label="Password"
+                  rules={[
+                    { required: true, message: "Please input the password!" },
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+              </Col>
+            )}
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="birthday"
+                label="Birthday"
+                rules={[
+                  { required: true, message: "Please input the birthday!" },
+                ]}
+              >
+                <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[{ required: true, message: "Please select gender!" }]}
+              >
+                <Select>
+                  <Option value="male">Male</Option>
+                  <Option value="female">Female</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="roleName"
+                label="Role"
+                rules={[{ required: true, message: "Please input the role!" }]}
+              >
+                <Select>
+                  <Option value="Admin">Admin</Option>
+                  <Option value="Staff">Staff</Option>
+                  <Option value="Customer">Customer</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          {editingUser ? null : (
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Form.Item name="status" label="Status">
+                  <Switch
+                    checkedChildren="Active"
+                    unCheckedChildren="Inactive"
+                    defaultChecked={editingUser ? editingUser.status : false}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          )}
+
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               {editingUser ? "Update" : "Add"}
