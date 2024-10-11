@@ -1,10 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from 'react-toastify';
-
-
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import Loading from "../components/Loading";
 const RegisterPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     registerAccount: {
       userName: "",
@@ -21,7 +22,6 @@ const RegisterPage = () => {
     },
   });
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     const [section, field] = name.split(".");
@@ -36,6 +36,7 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const res = await axios.post(
         "http://localhost:5222/api/v1/authenticate/register",
@@ -43,24 +44,26 @@ const RegisterPage = () => {
       );
       toast.success(res.data.message);
     } catch (err) {
-
       if (err.response && err.response.data && err.response.data.Message) {
-
         const serverErrors = err.response.data.Message;
         const newErrors = {};
-        serverErrors.forEach(error => {
-          const fieldName = error.FieldNameError.split('.').pop().toLowerCase();
+        serverErrors.forEach((error) => {
+          const fieldName = error.FieldNameError.split(".").pop().toLowerCase();
           newErrors[fieldName] = error.DescriptionError;
           toast.error(`${error.DescriptionError}`);
         });
       } else {
-        toast.error('An unexpected error occurred');
+        toast.error("An unexpected error occurred");
       }
+    } finally {
+      setIsLoading(false);
+      navigate("/");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {isLoading && <Loading />}
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-gray-50 py-6 px-8 border-b border-gray-200">
           <h2 className="text-3xl font-extrabold text-gray-900 text-center">
