@@ -1,230 +1,239 @@
-import React, { useState, useEffect } from "react";
-import { db, auth } from "./FirebaseConfig";
-import Sidebar from "./Sidebar";
+import { message } from "antd";
+import { onValue, push, ref, serverTimestamp } from "firebase/database";
+import {
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+} from "firebase/storage";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, addDoc, query, orderBy, onSnapshot, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage functions
-import "./ChatWindow.css";
+import { AuthContext } from "../../context/authContext"; // Import AuthContext
+import { db, storage } from "./FirebaseConfig";
 
-function ChatWindow() {
-  const [selectedConversationId, setSelectedConversationId] = useState(null);
+const ChatWindow = () => {
+  const { user } = useContext(AuthContext);
+  const chatId = `${user.id} ${user.firstName} ${user.lastName}`;
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState("");
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [usernames, setUsernames] = useState({}); // State to store usernames for UIDs
+  const [inputMessage, setInputMessage] = useState("");
+  const [fileList, setFileList] = useState([]);
+  const [downloadURL, setDownloadURL] = useState("");
   const navigate = useNavigate();
-  const storage = getStorage(); // Initialize Firebase Storage
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const checkUserCredentials = async () => {
       if (user) {
-        setUser(user);
-        // Fetch the user role from Firestore
-        const userRef = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userRef);
-        if (userSnapshot.exists()) {
-          setUserRole(userSnapshot.data().role);
-        }
+        const userRef = ref(db, `users/${user.id}`);
+        onValue(userRef, (snapshot) => {
+          const userData = snapshot.val();
+          if (userData) {
+            if (
+              userData.email === user.email &&
+              userData.password === user.password
+            ) {
+              loadMessages();
+            } else {
+              message.error("Thông tin tài khoản không hợp lệ.");
+            }
+          }
+        });
       }
-    });
+    };
+
+    checkUserCredentials();
+  }, [user]);
+
+  const loadMessages = () => {
+    const messagesRef = ref(db, `messages/${chatId}`);
+
+    const unsubscribe = onValue(
+      messagesRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const messagesArray = Object.entries(data).map(([key, value]) => ({
+            ...value,
+            id: key,
+          }));
+          setMessages(messagesArray);
+        } else {
+          setMessages([]);
+        }
+      },
+      (error) => {
+        console.error("Error loading messages:", error);
+      }
+    );
+
     return () => unsubscribe();
-  }, []);
+  };
 
   useEffect(() => {
-    if (selectedConversationId) {
-      const messagesRef = collection(db, "conversations", selectedConversationId, "messages");
-      const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+    scrollToBottom();
+  }, [messages, chatId]);
 
-      const unsubscribe = onSnapshot(messagesQuery, async (snapshot) => {
-        const messagesData = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-          formattedTime: doc.data().timestamp ? formatTimestamp(doc.data().timestamp.toDate()) : "",
-        }));
-        setMessages(messagesData);
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (inputMessage.trim() || fileList.length > 0) {
+      let messageToSend = inputMessage.trim();
 
-        // Fetch usernames for each senderId in the messages
-        const senderIds = new Set(messagesData.map((msg) => msg.senderId));
-        const newUsernames = { ...usernames };
+      if (fileList.length > 0) {
+        try {
+          const file = fileList[0].originFileObj;
 
-        await Promise.all(
-          Array.from(senderIds).map(async (senderId) => {
-            if (!newUsernames[senderId]) {
-              const userRef = doc(db, "users", senderId);
-              const userSnapshot = await getDoc(userRef);
-              if (userSnapshot.exists()) {
-                newUsernames[senderId] = userSnapshot.data().displayName || senderId;
-              }
-            }
-          })
-        );
+          if (!file) {
+            throw new Error("File object is undefined or null.");
+          }
 
-        setUsernames(newUsernames); // Update usernames state
-      });
+          const newMessage = {
+            message: downloadURL,
+            sender: `${user.firstName} ${user.lastName}`,
+            timestamp: serverTimestamp(),
+            read: true,
+          };
 
-      return () => unsubscribe();
-    }
-  }, [selectedConversationId, usernames]);
-
-  const handleSendMessage = async () => {
-    if (message.trim() !== "" && user && selectedConversationId) {
-      const messagesRef = collection(db, "conversations", selectedConversationId, "messages");
-      await addDoc(messagesRef, {
-        text: message,
-        senderId: user.uid,
-        senderEmail: user.email,
-        timestamp: new Date(),
-      });
-
-      const conversationRef = doc(db, "conversations", selectedConversationId);
-      await setDoc(
-        conversationRef,
-        {
-          latestMessageTimestamp: new Date(), // Update timestamp in conversation document
-        },
-        { merge: true }
-      );
-
-      setMessage("");
-    }
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const storageRef = ref(storage, `images/${selectedConversationId}/${file.name}`);
-    await uploadBytes(storageRef, file);
-
-    // Get the URL of the uploaded image
-    const downloadURL = await getDownloadURL(storageRef);
-
-    // Save the image URL to Firestore
-    if (user && selectedConversationId) {
-      const messagesRef = collection(db, "conversations", selectedConversationId, "messages");
-      await addDoc(messagesRef, {
-        text: "", // No text content since it's an image
-        senderId: user.uid,
-        senderEmail: user.email,
-        timestamp: new Date(),
-        imageUrl: downloadURL, // Store image URL in Firestore
-      });
-
-      const conversationRef = doc(db, "conversations", selectedConversationId);
-      await setDoc(
-        conversationRef,
-        {
-          latestMessageTimestamp: new Date(),
-        },
-        { merge: true }
-      );
-    }
-  };
-
-  const startConversation = async (selectedUser) => {
-    const currentUser = auth.currentUser;
-    if (currentUser && selectedUser) {
-      if (userRole === "customer" && selectedUser.role !== "staff") {
-        alert("You can only chat with staff members.");
-        return;
-      }
-
-      const conversationsRef = collection(db, "conversations");
-      const conversationQuery = query(conversationsRef, where("participants", "array-contains", currentUser.uid));
-      const snapshot = await getDocs(conversationQuery);
-
-      let conversationId = null;
-      snapshot.forEach((doc) => {
-        const participants = doc.data().participants;
-        if (participants.includes(selectedUser.id)) {
-          conversationId = doc.id;
+          push(ref(db, `messages/${chatId}`), newMessage);
+          setInputMessage("");
+          setFileList([]);
+        } catch (error) {
+          console.error("Error uploading file:", error);
+          message.error("Failed to upload file.");
         }
-      });
-
-      if (!conversationId) {
-        const newConversationRef = await addDoc(conversationsRef, {
-          participants: [currentUser.uid, selectedUser.id],
-        });
-        conversationId = newConversationRef.id;
+      } else {
+        const newMessage = {
+          message: messageToSend,
+          sender: `${user.firstName} ${user.lastName}`,
+          timestamp: serverTimestamp(),
+          read: true,
+        };
+        push(ref(db, `messages/${chatId}`), newMessage);
+        setInputMessage("");
       }
-
-      setSelectedConversationId(conversationId);
-      setSelectedUser(null);
     }
   };
 
-  // Helper function to format the timestamp to HH:mm
-  const formatTimestamp = (date) => {
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+  const handleFileChange = ({ fileList }) => {
+    setFileList(fileList);
   };
+
+  const uploadImage = async ({ onError, onSuccess, file }) => {
+    try {
+      if (!file) {
+        throw new Error("File object is undefined or null.");
+      }
+      const fileStorageRef = storageRef(storage, `files/${file.name}`);
+      const snapshot = await uploadBytes(fileStorageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      onSuccess("ok");
+      setDownloadURL(downloadURL);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      message.error("Failed to upload file.");
+    }
+  };
+
+  const renderMessage = (msg) => {
+    if (msg.message.startsWith("https://firebasestorage.googleapis.com")) {
+      const fileName = msg.message
+        .split("/")
+        .pop()
+        .split("?")[0]
+        .split("%2F")
+        .pop()
+        .split("%20")
+        .join(" ")
+        .split("%3A")
+        .join(":");
+      return (
+        <div className="flex items-center space-x-2">
+          <img src="" alt="File" className="w-6 h-6" />
+          <div className="flex flex-col">
+            <span className="font-semibold">{fileName}</span>
+            <a
+              href={msg.message}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline"
+            >
+              View
+            </a>
+          </div>
+        </div>
+      );
+    } else {
+      return <p>{msg.message}</p>;
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h2 className="text-xl font-bold">You are not logged in!</h2>
+        <button
+          onClick={() => navigate("/login")}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Go to Login
+        </button>
+        <p className="mt-2">
+          Don’t have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => navigate("/signup")}
+          >
+            Register
+          </span>
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="chat-window">
-      {/* Sidebar */}
-      <Sidebar className="chat-sidebar" onSelectConversation={setSelectedConversationId} onSelectUser={startConversation} currentUserRole={userRole} />
-
-      {/* Main Chat Window */}
-      <div className="chat-content" style={{ width: "70%", padding: "20px", display: "flex", flexDirection: "column" }}>
-        {/* Chat Header */}
-        <div className="chat-header">
-          <h3>Chat Window</h3>
-          {selectedConversationId && (
-            <button onClick={() => setSelectedConversationId(null)} className="chat-close-button">
-              Close Conversation
-            </button>
-          )}
-        </div>
-
-        {/* Messages Display */}
-        <div className="chat-messages">
+    <div className="flex flex-col w-full h-screen">
+      <div className="flex-1 overflow-y-auto bg-gray-100 p-4">
+        <div className="max-h-12 overflow-y-auto">
           {messages.map((msg, index) => (
-            <div key={index} className="chat-message">
-              <strong>{usernames[msg.senderId] || msg.senderEmail}:</strong>
-              <span> {msg.text}</span>
-              {msg.formattedTime && <span style={{ marginLeft: "10px", color: "#757575" }}>({msg.formattedTime})</span>}
-              {/* Display image if the message contains an image URL */}
-              {msg.imageUrl && <img src={msg.imageUrl} alt="Sent Image" style={{ maxWidth: "200px", marginTop: "10px" }} />}
+            <div
+              key={index}
+              className={`p-4 rounded-lg shadow-sm transition-all duration-200 ${
+                msg.sender === "System"
+                  ? "bg-red-200 text-red-800"
+                  : msg.sender === `${user.firstName} ${user.lastName}`
+                  ? "bg-blue-200 text-blue-800 self-end"
+                  : "bg-gray-300 text-gray-800"
+              }`}
+            >
+              <span className="font-semibold">{msg.sender}</span>
+              <div className="mt-1">{renderMessage(msg)}</div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
-
-        {/* Message Input and Send Button */}
-        {selectedConversationId && (
-          <div className="chat-input-container">
-            {/* Input for text message */}
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message"
-              className="chat-input"
-            />
-
-            {/* File input for image upload */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: "none" }}
-              id="image-upload"
-            />
-            <label htmlFor="image-upload" className="chat-upload-button">
-              +
-            </label>
-
-            {/* Send Button */}
-            <button onClick={handleSendMessage} className="chat-send-button">
-              Send
-            </button>
-          </div>
-        )}
       </div>
+      <form
+        onSubmit={sendMessage}
+        className="flex items-center p-4 bg-white border-t border-gray-300"
+      >
+        <input
+          type="text"
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          placeholder="Type your message here..."
+          className="flex-1 p-2 border border-gray-300 rounded-lg mr-2"
+        />
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
-}
+};
 
 export default ChatWindow;

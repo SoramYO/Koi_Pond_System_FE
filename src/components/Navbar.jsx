@@ -1,7 +1,8 @@
-import { Avatar, Dropdown, Menu, message } from "antd";
+import { Avatar, Dropdown, Menu } from "antd";
 import axios from "axios";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import logo from "../assets/images/logo.png";
 import { AuthContext } from "../context/authContext";
 const Navbar = () => {
@@ -11,7 +12,7 @@ const Navbar = () => {
     const res = await axios.post(
       "http://localhost:5222/api/v1/authenticate/logout"
     );
-    message.success(res.data.message);
+    toast.success(res.data.message);
   };
   const userMenu = (
     <Menu>
@@ -32,7 +33,13 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-24">
           {/* Logo Section */}
           <div className="flex-shrink-0">
-            <img className="h-16 w-auto" src={logo} alt="SGL Logo" />
+            <Link to="/">
+              <img
+                className="h-16 w-auto cursor-pointer"
+                src={logo}
+                alt="SGL Logo"
+              />
+            </Link>
           </div>
 
           {/* Menu Items */}
