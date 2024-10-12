@@ -57,7 +57,8 @@ const ManagerUser = () => {
   const handleAddUser = async (values) => {
     setIsLoading(true);
     try {
-      const newUser = { ...values, id };
+      const formattedBirthday = values.birthday.format("YYYY-MM-DD");
+      const newUser = { ...values, id, birthday: formattedBirthday };
 
       await axiosInstance.post("/users", newUser);
       toast.success("User added successfully");
@@ -101,11 +102,16 @@ const ManagerUser = () => {
   const handleEditUser = async (values) => {
     setIsLoading(true);
     try {
-      await axiosInstance.put(
+      const formattedBirthday = values.birthday.format("YYYY-MM-DD");
+      const updatedUser = {
+        ...values,
+        birthday: formattedBirthday,
+      };
+      const respone = await axiosInstance.put(
         `/account-manager/users/${editingUser.id}`,
-        values
+        updatedUser
       );
-      toast.success("User updated successfully");
+      toast.success(respone.data);
       fetchUsers();
       setIsModalVisible(false);
       setEditingUser(null);
@@ -325,9 +331,11 @@ const ManagerUser = () => {
                 rules={[{ required: true, message: "Please input the role!" }]}
               >
                 <Select>
-                  <Option value="Admin">Admin</Option>
-                  <Option value="Staff">Staff</Option>
+                  <Option value="Manager">Manager</Option>
                   <Option value="Customer">Customer</Option>
+                  <Option value="ConsultingStaff">ConsultingStaff</Option>
+                  <Option value="DesignStaff">DesignStaff</Option>
+                  <Option value="ConstructionStaff">ConstructionStaff</Option>
                 </Select>
               </Form.Item>
             </Col>
