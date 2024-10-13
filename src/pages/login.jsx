@@ -32,8 +32,19 @@ const LoginPage = () => {
       if (res.data.roleName === "Manager") {
         dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
         toast.success("Đăng nhập thành công!");
-
         navigate("/admin");
+      } else if (res.data.roleName === "ConsultingStaff") {
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+        toast.success("Đăng nhập thành công!");
+        navigate("/consultingstaff");
+      } else if (res.data.roleName === "DesignStaff") {
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+        toast.success("Đăng nhập thành công!");
+        navigate("/designstaff");
+      } else if (res.data.roleName === "ConstructionStaff") {
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+        toast.success("Đăng nhập thành công!");
+        navigate("/constructionstaff");
       } else {
         dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
         toast.success("Đăng nhập thành công!");

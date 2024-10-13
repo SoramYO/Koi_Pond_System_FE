@@ -15,13 +15,11 @@ const Hero = () => (
     className="mb-10 flex justify-center w-full hero bg-medium h-[32rem] backdrop-blur-3xl"
     style={{ backgroundImage: `url(${Background})` }}
   >
-    <div className="relative z-10 flex flex-col items justify-center px-8 py-16 w-full   text-white max-w-[1200px]">
+    <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+    <div className="relative z-10 flex flex-col items justify-center px-8 py-16 w-full text-white max-w-[1200px]">
       <h1 className="text-5xl font-bold mb-4">
         Thiết Kế Và Thi Công Hồ Cá Koi
       </h1>
-      <p className="text-xl">
-        Trang chủ &raquo; Dịch Vụ &raquo; Thiết Kế Và Thi Công Hồ Cá Koi
-      </p>
     </div>
   </section>
 );

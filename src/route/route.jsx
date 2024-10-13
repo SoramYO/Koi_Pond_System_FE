@@ -9,12 +9,14 @@ import CreateBlog from "../pages/Admin/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManagerUser from "../pages/Admin/ManagerUser";
 import ChangePassword from "../pages/changePassword";
-import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
 import Register from "../pages/Register";
+import StaffChat from "../pages/Staff/StaffChat";
 import StaffPage from "../pages/Staff/StaffPage";
+import ProtectedRoute from "./../config/ProtectedRoute";
+import StaffLayout from "./../layout/StaffLayout";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -64,7 +66,11 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute requiredRoles={["Manager"]}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
@@ -86,13 +92,22 @@ export const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/chatwindow",
-    element: <ChatWindow />,
+    path: "/consultingstaff",
+    element: (
+      <ProtectedRoute requiredRoles={["ConsultingStaff"]}>
+        <StaffLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorPage />,
-  },
-  {
-    path: "/staff",
-    element: <StaffPage />,
-    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <StaffPage />,
+      },
+      {
+        path: "chat",
+        element: <StaffChat />,
+      },
+    ],
   },
 ]);
