@@ -1,16 +1,10 @@
 import axios from "axios";
 import React, { useContext } from "react";
-import {
-  FiClipboard,
-  FiFileText,
-  FiHome,
-  FiLogOut,
-  FiUsers,
-} from "react-icons/fi"; // Import icons
+import { FiFileText, FiHome, FiLogOut, FiUsers } from "react-icons/fi"; // Import icons
+import { SiSpond } from "react-icons/si";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
-
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
@@ -37,7 +31,7 @@ const AdminSidebar = () => {
 
         {/* Users link */}
         <a
-          href="/admin/users"
+          href="/admin/manage-users"
           className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
         >
           <FiUsers className="mr-2" /> {/* Users icon */}
@@ -46,11 +40,11 @@ const AdminSidebar = () => {
 
         {/* Projects link */}
         <a
-          href="/admin/projects"
+          href="/admin/manager-pond"
           className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
         >
-          <FiClipboard className="mr-2" /> {/* Projects icon */}
-          Projects
+          <SiSpond className="mr-2" /> {/* Projects icon */}
+          Pond
         </a>
 
         {/* Blog link */}

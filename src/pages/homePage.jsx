@@ -138,9 +138,83 @@ const Sidebar = ({
     </div>
   </aside>
 );
+const ServiceProcess = () => (
+  <section id="quy-trinh-dich-vu" className="mt-12">
+    <h3 className="font-bold text-4xl text-center mb-8">
+      Quy Trình Dịch Vụ Của SGL Vietnam
+    </h3>
+    <p className="text-center text-base mb-10 mx-auto max-w-3xl">
+      Thiết kế và xây dựng hồ cá koi là sự kết hợp giữa chức năng (khoa học) và
+      thẩm mỹ (nghệ thuật) để mang lại cảm xúc cho gia chủ trong chính khu vườn
+      của mình. Khi thiết kế một hồ cá koi đòi hỏi phải tuân theo một quy trình
+      có hệ thống và khoa học.
+    </p>
+    <div className="relative mt-8 space-y-12">
+      {/* Vertical Line */}
+      <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-200"></div>
+
+      {steps.map((step, index) => (
+        <div
+          key={index}
+          className={`relative flex items-center ${
+            index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+          }`}
+        >
+          {/* Connector Circles */}
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg z-10">
+            {index + 1}
+          </div>
+
+          {/* Text Section */}
+          <div
+            className={`bg-white p-6 shadow-lg rounded-lg w-1/2 ${
+              index % 2 === 0 ? "ml-12 text-left" : "mr-12 text-right"
+            }`}
+          >
+            <h4 className="font-semibold text-xl mb-2">{step.title}</h4>
+            <p className="text-base">{step.content}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const steps = [
+  {
+    title: "BƯỚC 1: Tư vấn hình thức, phong cách hồ cá",
+    content:
+      "Kháo sát địa điểm thi công thực tế, trao đổi với khách hàng để hiểu rõ mong muốn, sở thích của khách. Dựa trên những điều đó, chúng tôi sẽ tư vấn phong cách, kích thước hồ phù hợp nhất.",
+  },
+  {
+    title: "BƯỚC 2: Lập báo giá và nhiệm vụ thiết kế",
+    content:
+      "Tùy thuộc vào quy mô, mức độ và phong cách của hồ, SGL Vietnam sẽ xem xét và báo giá cho khách hàng cụ thể và chính xác nhất.",
+  },
+  {
+    title: "BƯỚC 3: Lập hồ sơ thiết kế ý tưởng",
+    content:
+      "Sau khi ký hợp đồng, đội ngũ kiến trúc sư sẽ lập hồ sơ thiết kế ý tưởng dựa trên yêu cầu và chi tiết về hình dạng cũng như phong cách hồ cá koi.",
+  },
+  {
+    title: "BƯỚC 4: Lập hồ sơ thiết kế cơ sở và thiết kế thi công",
+    content:
+      "Sau khi gửi bản vẽ sơ bộ, chúng tôi sẽ trao đổi để hoàn thiện bản vẽ và tiếp tục làm việc với khách hàng để tạo ra sản phẩm hoàn hảo nhất.",
+  },
+  {
+    title: "BƯỚC 5: Tổ chức thi công từ thô đến hoàn thiện",
+    content:
+      "Đội ngũ kỹ sư và nhân viên sẽ thực hiện thi công theo hồ sơ triển khai. Kỹ sư giám sát công trình đảm bảo tiến độ và chất lượng thi công.",
+  },
+  {
+    title: "BƯỚC 6: Nghiệm thu, bàn giao và bảo dưỡng",
+    content:
+      "Sau khi hoàn thành thi công, chúng tôi sẽ tiếp tục bảo dưỡng cây cảnh và các hạng mục liên quan, sau đó bàn giao lại cho chủ đầu tư.",
+  },
+];
 
 const MainContent = React.forwardRef((props, ref) => (
-  <main className="flex-1 pr-40" ref={ref}>
+  <main className="flex-1 pr-40 mb-20" ref={ref}>
     {/* Introduction Section */}
     <section id="gioi-thieu">
       <h3 className="font-bold text-4xl mt-6 ml-1">Giới thiệu về Hồ Cá Koi</h3>
@@ -223,9 +297,60 @@ const MainContent = React.forwardRef((props, ref) => (
           3. Kích thước hồ
         </h4>
         <p className="text-base mt-2">
-          Kích thước hồ cá Koi cần được cân nhắc kỹ lưỡng để phù hợp với không
-          gian. Đội ngũ chuyên nghiệp của SGL Vietnam sẽ tư vấn cho bạn giải
-          pháp tối ưu.
+          Kích thước hồ cá koi cũng phải đảm bảo đạt được một số tiêu chuẩn nhất
+          định như sau:
+          <p> - Chiều dài tối thiểu của hồ cá Koi</p>
+          <p>
+            {" "}
+            Chiều dài hồ cá Koi ít nhất là 2m mới đủ để thiết kế đầy đủ hệ thống
+            cho hồ cá.
+          </p>
+          <p>- Chiều rộng tối thiểu của hồ cá Koi </p>
+          <p>
+            Ít nhất cũng phải đạt mức từ 0,8m đến 1m. Tùy thuộc vào chiều dài
+            của hồ cá Koi mà lựa chọn chiều rộng cho thích hợp.
+          </p>{" "}
+          <p>- Chiều sâu để thi công hồ cá Koi</p>
+          <p>Tùy mỗi dòng cá Koi để thiết kế độ sâu cho hồ cá.</p>
+          <p>
+            Đối với các dòng cá Koi rẻ, hồ chỉ cần sâu 0,6m. Tuy nhiên, với các
+            dòng cá Koi đẹp yêu cầu độ sâu phải đạt từ 0,8m đến 1,6m.
+          </p>
+        </p>
+      </div>
+      <div className="mt-8">
+        <h4 id="kich-thuoc-ho" className="font-semibold text-base">
+          4. Mực nước trong hồ
+        </h4>
+        <p className="text-base mt-2">
+          Mỗi vị trí đặt hồ sẽ có yêu cầu về mực nước khác nhau. Cụ thể như sau:
+        </p>
+        <ul>
+          <li>Hồ cá Koi trong nhà: Mực nước tối thiểu là 40 cm</li>
+          <li> Hồ cá Koi ngoài trời: Mực nước tối thiểu là 60 cm</li>
+        </ul>
+      </div>
+      <div className="mt-8">
+        <h4 id="kich-thuoc-ho" className="font-semibold text-base">
+          5. Hệ thống lọc nước và chất lượng nước
+        </h4>
+        <p className="text-base mt-2">
+          Bên cạnh đó mực nước cần chú ý đến chất lượng nước trong hồ. Một hồ cá
+          Koi đạt chuẩn sẽ được thiết kế thi công bằng hệ thống phụ kiện chất
+          lượng cao như drum filter inox 304… giúp nước trong, không tảo và
+          không có mầm bệnh, độ pH từ 7 – 7.5. Đồng thời cần đảm bảo luôn có
+          dòng nước tuần hoàn để giúp cá vận động và tăng trưởng tốt hơn.
+        </p>
+      </div>
+      <div className="mt-8">
+        <h4 id="kich-thuoc-ho" className="font-semibold text-base">
+          6. Cá koi
+        </h4>
+        <p className="text-base mt-2">
+          Hồ cá koi tất nhiên là phải có cá koi, tùy vào ngân sách bạn có thể
+          chọn cá koi Nhật hoặc cá koi Việt. Tuy nhiên, cá koi đẹp phải có mảng
+          màu sắc nét và màu sắc rõ ràng, dáng thon dài và đặc biệt không mang
+          các mầm bệnh.
         </p>
       </div>
     </section>
@@ -274,6 +399,7 @@ const MainContent = React.forwardRef((props, ref) => (
         </div>
       </div>
     </section>
+    <ServiceProcess />
   </main>
 ));
 
