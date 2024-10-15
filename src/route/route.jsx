@@ -6,18 +6,25 @@ import AboutUs from "../pages/AboutUs";
 import CreateBlog from "../pages/Admin/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManagerBlog from "../pages/Admin/ManagerBlog";
-import ManagerUser from "../pages/Admin/ManagerUser";
+import PondForm from "../pages/Admin/ManagerPond/PondForm";
+import ManagerUser from "../pages/Admin/ManagerUser/ManagerUser";
+import UserForm from "../pages/Admin/ManagerUser/UserForm";
 import ChangePassword from "../pages/changePassword";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
+import PondDetail from "../pages/PondDetail";
+import ProjectPond from "../pages/ProjectPond";
 import Register from "../pages/Register";
+import SelectPondPage from "../pages/SelectPondPage";
 import StaffChat from "../pages/Staff/StaffChat";
 import StaffPage from "../pages/Staff/StaffPage";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import StaffLayout from "./../layout/StaffLayout";
-import BlogDetail from './../pages/Blog/BlogDetail';
-import BlogList from './../pages/Blog/BlogList';
+import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
+import BlogDetail from "./../pages/Blog/BlogDetail";
+import BlogList from "./../pages/Blog/BlogList";
+import CustomPondPage from "./../pages/CustomPondPage";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -59,8 +66,27 @@ export const routes = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
+        path: "/projects",
+        element: <ProjectPond />,
+      },
+      {
         path: "/about",
         element: <AboutUs />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/pond/:id",
+        element: <PondDetail />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/select-pond/:id",
+        element: <SelectPondPage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/custom-pond/:id",
+        element: <CustomPondPage />,
         errorElement: <ErrorPage />,
       },
     ],
@@ -79,8 +105,16 @@ export const routes = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "users",
+        path: "manage-users",
         element: <ManagerUser />,
+      },
+      {
+        path: "add-user",
+        element: <UserForm />,
+      },
+      {
+        path: "edit-user/:id",
+        element: <UserForm />,
       },
       {
         path: "create-blog",
@@ -92,13 +126,24 @@ export const routes = createBrowserRouter([
       },
       {
         path: "blog/:id",
-        element: <BlogDetail />
+        element: <BlogDetail />,
       },
       {
         path: "edit-blog/:id",
-        element: <CreateBlog />
-      }
-
+        element: <CreateBlog />,
+      },
+      {
+        path: "manager-pond",
+        element: <ManagerPond />,
+      },
+      {
+        path: "add-pond",
+        element: <PondForm />,
+      },
+      {
+        path: "edit-pond/:id",
+        element: <PondForm />,
+      },
     ],
   },
   {
