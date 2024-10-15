@@ -1,7 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Progress, Table } from 'antd';
-import { ProjectOutlined, DollarOutlined, TeamOutlined, ClockCircleOutlined, UserOutlined, RiseOutlined, FallOutlined } from '@ant-design/icons';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  ClockCircleOutlined,
+  DollarOutlined,
+  FallOutlined,
+  ProjectOutlined,
+  RiseOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Card, Col, Progress, Row, Statistic, Table } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -31,42 +48,60 @@ const AdminDashboard = () => {
     });
 
     setRecentProjects([
-      { id: 1, name: 'Hồ Koi Sân Vườn', client: 'Nguyễn Văn A', status: 'Đang tiến hành', completion: 75 },
-      { id: 2, name: 'Hồ Koi Mini', client: 'Trần Thị B', status: 'Hoàn thành', completion: 100 },
-      { id: 3, name: 'Hồ Koi Biệt Thự', client: 'Lê Văn C', status: 'Lên kế hoạch', completion: 10 },
+      {
+        id: 1,
+        name: "Hồ Koi Sân Vườn",
+        client: "Nguyễn Văn A",
+        status: "Đang tiến hành",
+        completion: 75,
+      },
+      {
+        id: 2,
+        name: "Hồ Koi Mini",
+        client: "Trần Thị B",
+        status: "Hoàn thành",
+        completion: 100,
+      },
+      {
+        id: 3,
+        name: "Hồ Koi Biệt Thự",
+        client: "Lê Văn C",
+        status: "Lên kế hoạch",
+        completion: 10,
+      },
     ]);
 
     // Mock data for revenue per month
     setRevenueData([
-      { month: 'Tháng 1', revenue: 100000 },
-      { month: 'Tháng 2', revenue: 150000 },
-      { month: 'Tháng 3', revenue: 120000 },
-      { month: 'Tháng 4', revenue: 170000 },
-      { month: 'Tháng 5', revenue: 200000 },
-      { month: 'Tháng 6', revenue: 250000 },
-      { month: 'Tháng 7', revenue: 230000 },
-      { month: 'Tháng 8', revenue: 220000 },
-      { month: 'Tháng 9', revenue: 210000 },
-      { month: 'Tháng 10', revenue: 240000 },
-      { month: 'Tháng 11', revenue: 280000 },
-      { month: 'Tháng 12', revenue: 300000 },
+      { month: "Tháng 1", revenue: 100000 },
+      { month: "Tháng 2", revenue: 150000 },
+      { month: "Tháng 3", revenue: 120000 },
+      { month: "Tháng 4", revenue: 170000 },
+      { month: "Tháng 5", revenue: 200000 },
+      { month: "Tháng 6", revenue: 250000 },
+      { month: "Tháng 7", revenue: 230000 },
+      { month: "Tháng 8", revenue: 220000 },
+      { month: "Tháng 9", revenue: 210000 },
+      { month: "Tháng 10", revenue: 240000 },
+      { month: "Tháng 11", revenue: 280000 },
+      { month: "Tháng 12", revenue: 300000 },
     ]);
   }, []);
 
   const columns = [
-    { title: 'Tên Dự Án', dataIndex: 'name', key: 'name' },
-    { title: 'Khách Hàng', dataIndex: 'client', key: 'client' },
-    { title: 'Trạng Thái', dataIndex: 'status', key: 'status' },
+    { title: "Tên Dự Án", dataIndex: "name", key: "name" },
+    { title: "Khách Hàng", dataIndex: "client", key: "client" },
+    { title: "Trạng Thái", dataIndex: "status", key: "status" },
     {
-      title: 'Tiến Độ',
-      dataIndex: 'completion',
-      key: 'completion',
+      title: "Tiến Độ",
+      dataIndex: "completion",
+      key: "completion",
       render: (completion) => <Progress percent={completion} size="small" />,
     },
   ];
 
   return (
-    <div>
+    <div style={{ padding: "16px" }}>
       <h1 className="text-2xl font-bold mb-6">Bảng Điều Khiển</h1>
 
       <Row gutter={16}>
@@ -150,9 +185,11 @@ const AdminDashboard = () => {
           <Card title="Phân Bố Trạng Thái Dự Án">
             <Progress
               percent={(stats.ongoingProjects / stats.totalProjects) * 100}
-              success={{ percent: (stats.completedProjects / stats.totalProjects) * 100 }}
+              success={{
+                percent: (stats.completedProjects / stats.totalProjects) * 100,
+              }}
               type="dashboard"
-              format={() => 'Đang tiến hành'}
+              format={() => "Đang tiến hành"}
             />
           </Card>
         </Col>
@@ -168,13 +205,17 @@ const AdminDashboard = () => {
         </Col>
       </Row>
 
-      {/* Revenue Bar Chart */}
-      <h2 className="text-xl font-semibold mt-8 mb-4">Biểu Đồ Doanh Thu Hàng Tháng</h2>
+      <h2 className="text-xl font-semibold mt-8 mb-4">
+        Biểu Đồ Doanh Thu Hàng Tháng
+      </h2>
       <Row gutter={16} className="mt-4">
         <Col span={24}>
           <Card>
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={revenueData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <BarChart
+                data={revenueData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />

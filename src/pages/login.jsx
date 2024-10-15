@@ -6,12 +6,13 @@ import logo from "../assets/images/logo.png";
 import Loading from "../components/Loading";
 import { AuthContext } from "../context/authContext";
 const LoginPage = () => {
+  const [rememberMe, setRememberMe] = useState(false);
   const [credentials, setCredentials] = useState({
     userName: "",
     password: "",
+    rememberMe: rememberMe,
   });
   const [isLoading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const { loading, error, dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -23,40 +24,37 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     dispatch({ type: "LOGIN_START" });
+
     try {
       const res = await axios.post(
         "http://localhost:5222/api/v1/authenticate/login",
         credentials
       );
-      console.log(res.data);
-      if (res.data.roleName === "Manager") {
+
+      if (res.data.roleName) {
         dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
         toast.success("Đăng nhập thành công!");
-        navigate("/admin");
-      } else if (res.data.roleName === "ConsultingStaff") {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
-        toast.success("Đăng nhập thành công!");
-        navigate("/consultingstaff");
-      } else if (res.data.roleName === "DesignStaff") {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
-        toast.success("Đăng nhập thành công!");
-        navigate("/designstaff");
-      } else if (res.data.roleName === "ConstructionStaff") {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
-        toast.success("Đăng nhập thành công!");
-        navigate("/constructionstaff");
-      } else {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
-        toast.success("Đăng nhập thành công!");
-        navigate("/");
+
+        // Store token based on "remember me"
+        if (rememberMe) {
+          localStorage.setItem("token", res.data.AccessToken);
+        } else {
+          sessionStorage.setItem("token", res.data.AccessToken);
+        }
+
+        // Navigate based on role
+        const roleRoutes = {
+          Manager: "/admin",
+          ConsultingStaff: "/consultingstaff",
+          DesignStaff: "/designstaff",
+          ConstructionStaff: "/constructionstaff",
+        };
+        navigate(roleRoutes[res.data.roleName] || "/");
       }
     } catch (err) {
-      dispatch({
-        type: "LOGIN_FAILURE",
-        payload: "Đăng nhập thất bại",
-      });
+      dispatch({ type: "LOGIN_FAILURE", payload: "Đăng nhập thất bại" });
       toast.error(
-        err.response.data.Message[0].DescriptionError || "Đăng nhập thất bại"
+        err.response?.data.Message[0]?.DescriptionError || "Đăng nhập thất bại"
       );
     } finally {
       setLoading(false);

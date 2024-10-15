@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
 
-const AdminNavbar = () => {
+const AdminSidebar = () => {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
   const handleLogout = async () => {
@@ -55,7 +55,7 @@ const AdminNavbar = () => {
 
         {/* Blog link */}
         <a
-          href="/admin/create-blog"
+          href="/admin/blogs"
           className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
         >
           <FiFileText className="mr-2" /> {/* Blog icon */}
@@ -77,4 +77,4 @@ const AdminNavbar = () => {
   );
 };
 
-export default AdminNavbar;
+export default AdminSidebar;
