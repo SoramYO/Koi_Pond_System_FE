@@ -9,7 +9,7 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { db } from "./FirebaseConfig";
+import { db } from "../../firebase/FirebaseConfig";
 
 const ChatWindow = () => {
   const { user } = useContext(AuthContext);
@@ -112,13 +112,12 @@ const ChatWindow = () => {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`p-4 rounded-lg shadow-sm transition-all duration-200 mb-2 ${
-              msg.sender === "System"
+            className={`p-4 rounded-lg shadow-sm transition-all duration-200 mb-2 ${msg.sender === "System"
                 ? "bg-red-200 text-red-800"
                 : msg.sender === `${user.firstName} ${user.lastName}`
-                ? "bg-blue-200 text-blue-800 self-end"
-                : "bg-gray-300 text-gray-800"
-            }`}
+                  ? "bg-blue-200 text-blue-800 self-end"
+                  : "bg-gray-300 text-gray-800"
+              }`}
           >
             <span className="font-semibold">{msg.sender}</span>
             <div className="mt-1">{renderMessage(msg)}</div>
