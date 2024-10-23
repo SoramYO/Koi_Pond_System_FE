@@ -7,10 +7,15 @@ const axiosInstance = axios.create({
 // Thêm interceptor để thêm token vào header
 axiosInstance.interceptors.request.use(
   (config) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user.accessToken;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authRequired = ["/api/v1/pond/ponds"];
+    const path = new URL(config.baseURL + config.url).pathname;
+    const requiresAuth = !authRequired.some((url) => path.startsWith(url));
+    if (requiresAuth) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user.accessToken;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },

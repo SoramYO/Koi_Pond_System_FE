@@ -3,6 +3,7 @@ import AdminLayout from "../layout/AdminLayout";
 import CustomerLayout from "../layout/CustomerLayout";
 import Services from "../pages//servicesDisplay";
 import AboutUs from "../pages/AboutUs";
+import AccountProfile from "../pages/AccountProfile";
 import CreateBlog from "../pages/Admin/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManagerBlog from "../pages/Admin/ManagerBlog";
@@ -162,6 +163,25 @@ export const routes = createBrowserRouter([
       {
         path: "chat",
         element: <StaffChat />,
+      },
+    ],
+  },
+  {
+    path: "/customer",
+    element: (
+      <ProtectedRoute requiredRoles={["Customer"]}>
+        <CustomerLayout />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "index",
+        element: <HomePage />,
+      },
+      {
+        path: "profile",
+        element: <AccountProfile />,
       },
     ],
   },
