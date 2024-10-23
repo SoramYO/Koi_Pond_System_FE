@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../Axios/axiosInstance";
 import ComponentsSelection from "../components/ComponentsSelection";
@@ -12,6 +12,7 @@ const calculatePriceByArea = (area) => {
   if (area > 50 && area <= 100) return area * 15000000;
   return area * 9000000;
 };
+
 const PondAreaCalculator = ({ area, onPriceCalculated }) => {
   const price = useMemo(() => calculatePriceByArea(Number(area)), [area]);
 
@@ -60,8 +61,7 @@ const PondAreaCalculator = ({ area, onPriceCalculated }) => {
     </div>
   );
 };
-const CustomPondPage = () => {
-  const { id } = useParams();
+const OrderPage = () => {
   const { user } = useContext(AuthContext);
   const [componentsData, setComponentsData] = useState([]);
   const [selectedComponents, setSelectedComponents] = useState({});
@@ -96,31 +96,6 @@ const CustomPondPage = () => {
     };
     fetchComponents();
   }, []);
-  useEffect(() => {
-    const fetchPondDetails = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axiosInstance.get(`/pond/pond/${id}`);
-        const pondData = response.data;
-        console.log(pondData);
-        setPondDetails({
-          ...pondData,
-          pondDepth: pondData.pondDepth || 0,
-          area: pondData.area || 0,
-          listComponent: componentsData,
-        });
-      } catch (error) {
-        console.error("Error fetching pond details:", error);
-        toast.error("Không thể tải thông tin hồ cá");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchPondDetails();
-    }
-  }, [id]);
 
   // Handle input change for pond details
   const handlePondDetailChange = (e) => {
@@ -275,14 +250,6 @@ const CustomPondPage = () => {
               <option value="Freeform">Hình tự do</option>
             </select>
           </div>
-          <div>
-            <label className="block mb-2">Hình ảnh thiết kế</label>
-            <img
-              src={pondDetails.designImage}
-              alt="Design"
-              className="w-full h-auto"
-            />
-          </div>
         </div>
         <ComponentsSelection
           componentsData={componentsData}
@@ -329,4 +296,4 @@ const CustomPondPage = () => {
   );
 };
 
-export default CustomPondPage;
+export default OrderPage;
