@@ -14,6 +14,7 @@ import ChangePassword from "../pages/changePassword";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
+import OrderPage from "../pages/OrderPage";
 import PondDetail from "../pages/PondDetail";
 import ProjectPond from "../pages/ProjectPond";
 import Register from "../pages/Register";
@@ -36,9 +37,19 @@ export const routes = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
+
       {
         path: "/blog",
         element: <BlogList />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/order",
+        element: (
+          <ProtectedRoute requiredRoles={["Customer"]}>
+            <OrderPage />
+          </ProtectedRoute>
+        ),
         errorElement: <ErrorPage />,
       },
       {
