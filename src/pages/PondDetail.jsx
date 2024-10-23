@@ -6,6 +6,8 @@ import axiosInstance from "./../Axios/axiosInstance";
 const PondDetail = () => {
   const { id } = useParams();
   const [pond, setPond] = useState(null);
+  const [components, setComponent] = useState(null);
+  const [services, setService] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -13,6 +15,14 @@ const PondDetail = () => {
       try {
         const response = await axiosInstance.get(`/pond/pond/${id}`);
         setPond(response.data);
+        const servicetypeResponse = await axiosInstance.get(
+          `/display/services-display`
+        );
+        setService(servicetypeResponse.data);
+        const componentResponse = await axiosInstance.get(
+          `/display/components-display`
+        );
+        setComponent(componentResponse.data);
       } catch (error) {
         console.error("Error fetching pond details:", error);
       } finally {
@@ -80,31 +90,17 @@ const PondDetail = () => {
       {/* New Sections for Order Items and Pond Components */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-2xl font-bold mb-4">Thành Phần Hồ Cá</h2>
-        {pond.pondComponents && pond.pondComponents.length > 0 ? (
+        {pond.components && pond.components.length > 0 ? (
           <ul className="list-disc ml-8">
-            {pond.pondComponents.map((component, index) => (
+            {pond.components.map((component, index) => (
               <li key={index} className="mb-2">
-                {component}
+                Component ID: {component.componentId}, Amount:{" "}
+                {component.amount}
               </li>
             ))}
           </ul>
         ) : (
           <p>Không có thành phần nào.</p>
-        )}
-      </div>
-
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold mb-4">Danh Sách Đơn Hàng</h2>
-        {pond.orderItems && pond.orderItems.length > 0 ? (
-          <ul className="list-disc ml-8">
-            {pond.orderItems.map((item, index) => (
-              <li key={index} className="mb-2">
-                {item}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Không có đơn hàng nào.</p>
         )}
       </div>
 
