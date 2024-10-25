@@ -11,22 +11,24 @@ import PondForm from "../pages/Admin/ManagerPond/PondForm";
 import ManagerUser from "../pages/Admin/ManagerUser/ManagerUser";
 import UserForm from "../pages/Admin/ManagerUser/UserForm";
 import ChangePassword from "../pages/changePassword";
+import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
-import OrderPage from "../pages/OrderPage";
+import CustomPondPage from "../pages/Order/CustomPondPage";
+import OrderPage from "../pages/Order/OrderPage";
+import SelectPondPage from "../pages/Order/SelectPondPage";
 import PondDetail from "../pages/PondDetail";
 import ProjectPond from "../pages/ProjectPond";
 import Register from "../pages/Register";
-import SelectPondPage from "../pages/SelectPondPage";
+import StaffPage from "../pages/Staff/ConsultingStaff/StaffPage";
 import StaffChat from "../pages/Staff/StaffChat";
-import StaffPage from "../pages/Staff/StaffPage";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import StaffLayout from "./../layout/StaffLayout";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
 import BlogDetail from "./../pages/Blog/BlogDetail";
 import BlogList from "./../pages/Blog/BlogList";
-import CustomPondPage from "./../pages/CustomPondPage";
+import OrderDetailsPage from "./../pages/Staff/ConsultingStaff/OrderDetailsPage";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -48,6 +50,15 @@ export const routes = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRoles={["Customer"]}>
             <OrderPage />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/contact",
+        element: (
+          <ProtectedRoute requiredRoles={["Customer"]}>
+            <ChatWindow />
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage />,
@@ -174,6 +185,10 @@ export const routes = createBrowserRouter([
       {
         path: "chat",
         element: <StaffChat />,
+      },
+      {
+        path: "orders/:orderId",
+        element: <OrderDetailsPage />,
       },
     ],
   },
