@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { calculateOrderTotal } from "../components/Calculate/PondAreaCalculator";
 
 const ComponentCard = ({ component, selectedAmount, onAmountChange }) => {
   const totalPrice = useMemo(() => {
@@ -81,28 +82,19 @@ const ComponentsSelection = ({
   componentsData,
   selectedComponents,
   onComponentChange,
+  area,
+  onTotalUpdate,
 }) => {
   const totals = useMemo(() => {
-    const categoryTotals = {};
-    let grandTotal = 0;
+    return calculateOrderTotal(area, selectedComponents, componentsData);
+  }, [area, componentsData, selectedComponents]);
 
-    if (Array.isArray(componentsData)) {
-      componentsData.forEach((category) => {
-        if (Array.isArray(category.components)) {
-          let categoryTotal = 0;
-          category.components.forEach((component) => {
-            const amount = selectedComponents[component.id] || 0;
-            const total = component.pricePerItem * amount;
-            categoryTotal += total;
-            grandTotal += total;
-          });
-          categoryTotals[category.id] = categoryTotal;
-        }
-      });
+  // Notify parent component when totals change
+  React.useEffect(() => {
+    if (onTotalUpdate) {
+      onTotalUpdate(totals);
     }
-
-    return { categoryTotals, grandTotal };
-  }, [componentsData, selectedComponents]);
+  }, [totals, onTotalUpdate]);
 
   return (
     <div className="w-full px-4 py-6 space-y-6">
@@ -145,18 +137,31 @@ const ComponentsSelection = ({
       </div>
 
       <div className="mt-8 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200/50 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {componentsData.map((category) => (
-            <div key={category.id} className="space-y-1">
-              <div className="text-sm font-medium text-gray-600">
-                {category.name}
-              </div>
-              <div className="text-lg font-bold text-blue-600">
-                {totals.categoryTotals[category.id]?.toLocaleString() || "0"}{" "}
-                VND
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-600">
+              Chi phí diện tích
             </div>
-          ))}
+            <div className="text-lg font-bold text-blue-600">
+              {totals.areaCost.toLocaleString()} VND
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-600">
+              Chi phí thành phần
+            </div>
+            <div className="text-lg font-bold text-blue-600">
+              {totals.componentsCost.toLocaleString()} VND
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-600">
+              Tổng chi phí
+            </div>
+            <div className="text-lg font-bold text-blue-600">
+              {totals.totalCost.toLocaleString()} VND
+            </div>
+          </div>
         </div>
       </div>
     </div>

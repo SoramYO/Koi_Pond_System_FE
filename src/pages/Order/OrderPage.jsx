@@ -1,66 +1,14 @@
+import { push, ref, serverTimestamp } from "firebase/database";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../Axios/axiosInstance";
-import ComponentsSelection from "../components/ComponentsSelection";
-import Loading from "../components/Loading";
-import { AuthContext } from "../context/authContext";
-const calculatePriceByArea = (area) => {
-  if (area <= 0) return 0;
-  if (area > 0 && area <= 20) return area * 25000000;
-  if (area > 20 && area <= 50) return area * 21000000;
-  if (area > 50 && area <= 100) return area * 15000000;
-  return area * 9000000;
-};
+import axiosInstance from "../../Axios/axiosInstance";
+import PondAreaCalculator from "../../components/Calculate/PondAreaCalculator";
+import ComponentsSelection from "../../components/ComponentsSelection";
+import Loading from "../../components/Loading";
+import { AuthContext } from "../../context/authContext";
+import { db } from "../../firebase/FirebaseConfig";
 
-const PondAreaCalculator = ({ area, onPriceCalculated }) => {
-  const price = useMemo(() => calculatePriceByArea(Number(area)), [area]);
-
-  // Call the callback whenever price changes
-  React.useEffect(() => {
-    if (onPriceCalculated) {
-      onPriceCalculated(price);
-    }
-  }, [price, onPriceCalculated]);
-
-  return (
-    <div className="bg-white/30 backdrop-blur-md rounded-xl shadow-lg border border-gray-100/50 p-4 mb-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Chi phí theo diện tích
-      </h3>
-
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-600">Diện tích:</span>
-          <span className="font-medium">{area} m²</span>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <span className="text-gray-600">Đơn giá áp dụng:</span>
-          <span className="font-medium">
-            {area <= 20
-              ? "25,000,000"
-              : area <= 50
-              ? "21,000,000"
-              : area <= 100
-              ? "15,000,000"
-              : "9,000,000"}{" "}
-            VNĐ/m²
-          </span>
-        </div>
-
-        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-          <span className="text-gray-700 font-semibold">
-            Tổng chi phí diện tích:
-          </span>
-          <span className="text-lg font-bold text-blue-600">
-            {price.toLocaleString()} VNĐ
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
 const OrderPage = () => {
   const { user } = useContext(AuthContext);
   const [componentsData, setComponentsData] = useState([]);
@@ -128,6 +76,8 @@ const OrderPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const chatId = `${user.id} ${user.firstName} ${user.lastName}`;
+
     const componentsList = Object.keys(selectedComponents).map(
       (componentId) => ({
         componentId: parseInt(componentId),
@@ -152,12 +102,45 @@ const OrderPage = () => {
 
     try {
       setIsLoading(true);
+
+      // Create the order
       const response = await axiosInstance.post("/order/create-order", payload);
-      toast.success("Order created successfully:", response.data);
+
+      // Prepare chat message with order details
+      const orderSummary = `
+  🛒 Đơn hàng mới #${response.data.id || "Pending"}
+  
+  Chi tiết hồ cá:
+  - Tên: ${pondDetails.pondName}
+  - Diện tích: ${pondDetails.area}m²
+  - Hình dạng: ${pondDetails.shape}
+  - Vị trí: ${pondDetails.location}
+  
+  Chi phí:
+  - Chi phí diện tích: ${areaPrice.toLocaleString()} VNĐ
+  - Chi phí thiết bị: ${(totalPrice - areaPrice).toLocaleString()} VNĐ
+  - Tổng chi phí: ${totalPrice.toLocaleString()} VNĐ
+  
+  Trạng thái: Đang chờ xử lý
+      `;
+
+      // Send notification to chat
+      const chatMessage = {
+        message: orderSummary,
+        sender: "System",
+        timestamp: serverTimestamp(),
+        read: true,
+      };
+
+      await push(ref(db, `messages/${chatId}`), chatMessage);
+
+      toast.success("Đặt hàng thành công!");
       setIsLoading(false);
       navigate("/customer/profile");
     } catch (error) {
       console.error("Error creating order:", error);
+      toast.error("Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại sau.");
+      setIsLoading(false);
     }
   };
 

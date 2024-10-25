@@ -66,7 +66,7 @@ const UserForm = () => {
         await axiosInstance.post("/users", userData);
         toast.success("User added successfully");
       }
-      navigate("/manage-users");
+      navigate("/admin/manage-users");
     } catch (error) {
       toast.error(id ? "Failed to update user" : "Failed to add user");
     } finally {
