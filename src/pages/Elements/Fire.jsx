@@ -1,4 +1,3 @@
-import ElementCard from "../../components/ElementCard";
 
 const Fire = () => {
     return (

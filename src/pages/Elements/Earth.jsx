@@ -1,4 +1,4 @@
-import ElementCard from "../../components/ElementCard";
+
 
 const Earth = () => {
     return (

@@ -26,7 +26,7 @@ const LoginPage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/login",
+        "http://localhost:8080/api/v1/login",
         credentials
       );
 
@@ -41,9 +41,10 @@ const LoginPage = () => {
           sessionStorage.setItem("token", res.data.accessToken);
         }
         const roleRoutes = {
-          admin: "/admin",
+          Admin: "/admin",
         };
-        navigate(roleRoutes[res.data.roleName] || "/");
+        
+        navigate(roleRoutes[res.data.user.role] || "/");
       }
     } catch (err) {
       dispatch({ type: "LOGIN_FAILURE", payload: "Đăng nhập thất bại" });
