@@ -9,7 +9,6 @@ import React, { useEffect, useRef, useState } from "react";
 const ChatPanel = ({ chatId, customerName, orderId }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const db = getDatabase();

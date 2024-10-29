@@ -8,9 +8,8 @@ import { AuthContext } from "../context/authContext";
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [credentials, setCredentials] = useState({
-    userName: "",
+    email: "",
     password: "",
-    rememberMe: rememberMe,
   });
   const [isLoading, setLoading] = useState(false);
   const { loading, error, dispatch } = useContext(AuthContext);
@@ -27,35 +26,28 @@ const LoginPage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5222/api/v1/authenticate/login",
+        "http://localhost:8080/api/login",
         credentials
       );
 
-      if (res.data.roleName) {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+      if (res.data.user) {
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data.user });
         toast.success("Đăng nhập thành công!");
 
         // Store token based on "remember me"
         if (rememberMe) {
-          localStorage.setItem("token", res.data.AccessToken);
+          localStorage.setItem("token", res.data.accessToken);
         } else {
-          sessionStorage.setItem("token", res.data.AccessToken);
+          sessionStorage.setItem("token", res.data.accessToken);
         }
-
-        // Navigate based on role
         const roleRoutes = {
-          Manager: "/admin",
-          ConsultingStaff: "/consultingstaff",
-          DesignStaff: "/designstaff",
-          ConstructionStaff: "/constructionstaff",
+          admin: "/admin",
         };
         navigate(roleRoutes[res.data.roleName] || "/");
       }
     } catch (err) {
       dispatch({ type: "LOGIN_FAILURE", payload: "Đăng nhập thất bại" });
-      toast.error(
-        err.response?.data.Message[0]?.DescriptionError || "Đăng nhập thất bại"
-      );
+      toast.error(err.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -84,13 +76,13 @@ const LoginPage = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                    id="userName"
-                    name="userName"
-                    type="userName"
-                    autoComplete="userName"
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
-                    value={credentials.userName}
+                    value={credentials.email}
                     onChange={handleChange}
                   />
                 </div>

@@ -15,20 +15,18 @@ import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
-import CustomPondPage from "../pages/Order/CustomPondPage";
-import OrderPage from "../pages/Order/OrderPage";
-import SelectPondPage from "../pages/Order/SelectPondPage";
-import PondDetail from "../pages/PondDetail";
-import ProjectPond from "../pages/ProjectPond";
+
 import Register from "../pages/Register";
-import StaffPage from "../pages/Staff/ConsultingStaff/StaffPage";
-import StaffChat from "../pages/Staff/StaffChat";
 import ProtectedRoute from "./../config/ProtectedRoute";
-import StaffLayout from "./../layout/StaffLayout";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
 import BlogDetail from "./../pages/Blog/BlogDetail";
 import BlogList from "./../pages/Blog/BlogList";
-import OrderDetailsPage from "./../pages/Staff/ConsultingStaff/OrderDetailsPage";
+import Metal from "./../pages/Elements/Metal";
+import Wood from "../pages/Elements/Wood";
+import Earth from "../pages/Elements/Earth";
+import Fire from "../pages/Elements/Fire";
+import Water from "../pages/Elements/Water";
+import CreateDirection from "../pages/Admin/CreateDirection";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -43,15 +41,6 @@ export const routes = createBrowserRouter([
       {
         path: "/blog",
         element: <BlogList />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/order",
-        element: (
-          <ProtectedRoute requiredRoles={["Customer"]}>
-            <OrderPage />
-          </ProtectedRoute>
-        ),
         errorElement: <ErrorPage />,
       },
       {
@@ -88,30 +77,37 @@ export const routes = createBrowserRouter([
         element: <Services />,
         errorElement: <ErrorPage />,
       },
+      { path: "/about", element: <AboutUs />, errorElement: <ErrorPage /> },
       {
-        path: "/projects",
-        element: <ProjectPond />,
-      },
-      {
-        path: "/about",
-        element: <AboutUs />,
+        path: "/elements/metal",
+        element: <Metal />,
         errorElement: <ErrorPage />,
       },
       {
-        path: "/pond/:id",
-        element: <PondDetail />,
+        path: "/elements/wood",
+        element: <Wood />,
         errorElement: <ErrorPage />,
       },
       {
-        path: "/select-pond/:id",
-        element: <SelectPondPage />,
+        path: "/elements/water",
+        element: <Water />,
         errorElement: <ErrorPage />,
       },
       {
-        path: "/custom-pond/:id",
-        element: <CustomPondPage />,
+        path: "/elements/fire",
+        element: <Fire />,
         errorElement: <ErrorPage />,
       },
+      {
+        path: "/elements/earth",
+        element: <Earth />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/direction",
+        element: <CreateDirection />,
+        errorElement: <ErrorPage />,
+      }
     ],
   },
   {
@@ -166,29 +162,6 @@ export const routes = createBrowserRouter([
       {
         path: "edit-pond/:id",
         element: <PondForm />,
-      },
-    ],
-  },
-  {
-    path: "/consultingstaff",
-    element: (
-      <ProtectedRoute requiredRoles={["ConsultingStaff"]}>
-        <StaffLayout />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <StaffPage />,
-      },
-      {
-        path: "chat",
-        element: <StaffChat />,
-      },
-      {
-        path: "orders/:orderId",
-        element: <OrderDetailsPage />,
       },
     ],
   },
