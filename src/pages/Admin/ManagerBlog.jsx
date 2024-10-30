@@ -77,6 +77,12 @@ const ManagerBlog = () => {
               </div>
             </div>
           ))}
+          <button
+            onClick={() => navigate("/admin/create-blog")}
+            className="text-blue-500 underline"
+          >
+            Create a new one!
+          </button>
         </div>
       )}
     </div>

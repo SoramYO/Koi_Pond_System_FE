@@ -1,35 +1,48 @@
 import { Editor } from "@tinymce/tinymce-react";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import FormField from "../../components/FormField";
-import { db, storage } from "../../firebase/FirebaseConfig";
+import { storage } from "../../firebase/FirebaseConfig";
 import axiosInstance from "../../Axios/axiosInstance";
 import Loading from "../../components/Loading";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const CreateBlog = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
-  const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedTag, setSelectedTag] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [pondFeature, setPondFeature] = useState([]);
+  const [koiFishBreeds, setKoiFishBreeds] = useState([]);
+  const [zodiacElements, setZodiacElements] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [childTagInput, setChildTagInput] = useState("");
   const [suggestedTags, setSuggestedTags] = useState([]);
   const [suggestedChildTags, setSuggestedChildTags] = useState([]);
   const predefinedTags = [
-    "KoiFishBreeds",
-    "PondFeatures",
-    "ZodiacElements",
-    "WaterClarity",
-    "FishCare",
+    "Giống Cá Koi",
+    "Tính Năng Hồ",
+    "Yếu Tố Cung Hoàng Đạo",
   ];
+  const vietnameseTranslation = {
+    koiFishBreeds: "Giống Cá Koi",
+    pondFeature: "Tính Năng Hồ",
+    zodiacElements: "Yếu Tố Cung Hoàng Đạo",
+  };
+
+  const translateToVietnamese = (key) => vietnameseTranslation[key] || key;
 
   const childTags = {
-    KoiFishBreeds: ["Kohaku", "Sanke", "Showa", "Taisho Sanke"],
-    PondFeatures: ["Waterfall", "Fountain", "Bridge", "Statue"],
+    [translateToVietnamese("pondFeature")]: pondFeature.map(
+      (feature) => feature.targetType + " " + feature.value
+    ),
+    [translateToVietnamese("koiFishBreeds")]: koiFishBreeds.map(
+      (breed) => breed.name
+    ),
+    [translateToVietnamese("zodiacElements")]: zodiacElements.map(
+      (element) => element.name
+    ),
   };
 
   const [formData, setFormData] = useState({
@@ -39,44 +52,27 @@ const CreateBlog = () => {
     image: null,
     imagePreview: null,
   });
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      setIsEditing(true);
-      const fetchBlog = async () => {
-        try {
-          const blogRef = ref(db, `blogs/${id}`); // Reference to the specific blog using the id
-          //const snapshot = await get(blogRef); // Get the blog data
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const pondFeatures = await axiosInstance.get(`/pond-features`);
+        setPondFeature(pondFeatures.data.pondFeatures);
 
-          //   if (snapshot.exists()) {
-          //     const blogData = snapshot.val();
+        const koiFishBreeds = await axiosInstance.get(`/koi-fish-breeds`);
+        setKoiFishBreeds(koiFishBreeds.data.koiFishBreeds);
 
-          //     // Assuming blogData has a nested structure, access the first key
-          //     const blogKey = Object.keys(blogData)[0]; // This gets the dynamic key (like "-O99WEzeCm-ElOEqFSeu")
-
-          //     // Now, access the actual blog data
-          //     const { title, content, image, createdAt } = blogData[blogKey];
-
-          //     setFormData({
-          //       id: id, // Use the id from the URL
-          //       title: title,
-          //       content: content,
-          //       imagePreview: image,
-          //       createdAt: createdAt,
-          //     });
-          //   } else {
-          //     console.log("Blog not found.");
-          //   }
-        } catch (error) {
-          console.error("Error fetching blog: ", error);
-        } finally {
-          setLoading(false); // Stop loading after fetching
-        }
-      };
-      fetchBlog();
-    }
-  }, [id]);
+        const zodiacElements = await axiosInstance.get(`/zodiac-elements`);
+        setZodiacElements(zodiacElements.data.zodiacs);
+      } catch (error) {
+        console.error("Error fetching blog: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -100,35 +96,26 @@ const CreateBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { title, content, image } = formData;
-    if ((title && content && image) || imagePreview) {
+    const { title, content, image, tags } = formData;
+    if ((title && content && image && tags) || imagePreview) {
       try {
         setLoading(true);
-        let imageUrlToSave = imageUrl;
-
-        if (!isEditing) {
-          const storageRef = ref(storage, `images/${image.name}`);
-          const snapshot = await uploadBytes(storageRef, image);
-          imageUrlToSave = await getDownloadURL(snapshot.ref);
-        }
-
+        let imageUrlToSave = "";
+        const storageRef = ref(storage, `images/${image.name}`);
+        const snapshot = await uploadBytes(storageRef, image);
+        imageUrlToSave = await getDownloadURL(snapshot.ref);
         const blogData = {
-          title,
-          content,
+          title: formData.title,
+          content: formData.content,
           image: imageUrlToSave,
+          tags: formData.tags,
         };
 
-        if (isEditing) {
-          // const blogRef = doc(db, "blogs", id);
-          // await setDoc(blogRef, blogData);
-          toast.success("Blog updated successfully!");
-          setLoading(false);
-        } else {
-          console.log(blogData);
-          const res = await axiosInstance.post("/blog", blogData);
-          toast.success(res.data.message);
-          setLoading(false);
-        }
+        console.log(blogData);
+        const res = await axiosInstance.post("/blog", blogData);
+        toast.success(res.data.message);
+        setLoading(false);
+
         navigate("/admin/blogs");
       } catch (error) {
         console.error("Error adding document: ", error);
@@ -140,20 +127,25 @@ const CreateBlog = () => {
   };
 
   const { title, content, tags, imagePreview } = formData;
+
   const handleAddTag = (tag) => {
-    if (tag.trim() !== "") {
+    // Check if the tag already exists
+    if (!formData.tags.some((t) => t.tag === tag)) {
       setFormData((prevData) => ({
         ...prevData,
-        tags: [...prevData.tags, tag],
+        tags: [...prevData.tags, { tag: tag, childTags: [] }], // Create new tag with empty childTags
       }));
       setSelectedTag(tag);
-      setTagInput(tag);
-      setSuggestedTags([]); // Clear suggestions
+      setTagInput(""); // Clear input after adding
+      setSuggestedTags([]); // Clear suggested tags
 
-      console.log(childTags[tag]);
-      setSuggestedChildTags(childTags[tag] || []);
+      const childTagsForTag = childTags[tag] || [];
+      setSuggestedChildTags(childTagsForTag);
+    } else {
+      toast.warning("Tag đã được chọn trước đó!");
     }
   };
+
   const handleRemoveTag = (index) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -185,21 +177,67 @@ const CreateBlog = () => {
       return;
     }
 
-    // Filter child tags based on the input
-    const matchingChildTags = childTags[selectedTag].filter((childTag) =>
-      childTag.toLowerCase().includes(input.toLowerCase())
-    );
+    // Kiểm tra lại selectedTag và childTags[selectedTag] trước khi lọc
+    if (selectedTag && childTags[selectedTag]) {
+      const matchingChildTags = childTags[selectedTag].filter((childTag) =>
+        childTag.toLowerCase().includes(input.toLowerCase())
+      );
 
-    setSuggestedChildTags(matchingChildTags);
+      setSuggestedChildTags(matchingChildTags);
+      console.log("Matching child tags:", matchingChildTags); // Kiểm tra các gợi ý phù hợp
+    } else {
+      setSuggestedChildTags([]);
+    }
   };
+  const handleAddChildTag = (childTag) => {
+    if (childTag.trim() !== "") {
+      setFormData((prevData) => {
+        const updatedTags = prevData.tags.map((item) => {
+          if (item.tag === selectedTag) {
+            // If the selected tag matches, add the child tag
+            return { ...item, childTags: [...item.childTags, childTag] };
+          }
+          return item; // Return the tag unchanged
+        });
+
+        return {
+          ...prevData,
+          tags: updatedTags, // Update the tags with the new child tag
+        };
+      });
+      setChildTagInput(""); // Clear child tag input after adding
+      setSuggestedChildTags([]); // Clear suggested child tag suggestions
+    }
+  };
+  const handleRemoveChildTag = (tagIndex, childTagIndex) => {
+    setFormData((prevData) => {
+      const updatedTags = prevData.tags.map((tag, index) => {
+        if (index === tagIndex) {
+          // Remove the child tag by filtering out the specific childTag
+          return {
+            ...tag,
+            childTags: tag.childTags.filter(
+              (_, cIndex) => cIndex !== childTagIndex
+            ),
+          };
+        }
+        return tag; // Return the tag unchanged
+      });
+
+      return {
+        ...prevData,
+        tags: updatedTags, // Update the tags with the modified child tag
+      };
+    });
+  };
+
   if (loading) {
     return <Loading />;
   }
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        {isEditing ? "Edit Blog" : "Create a New Blog"}
-      </h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">Create a New Blog</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="mb-4">
@@ -253,15 +291,14 @@ const CreateBlog = () => {
                 />
                 {suggestedChildTags.length > 0 && (
                   <div className="border border-gray-300 rounded-lg p-2 bg-gray-50 mt-2">
-                    {suggestedChildTags.map((childTag, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleAddTag(childTag)}
+                    {suggestedChildTags.map((childTag) => (
+                      <div
+                        key={childTag}
                         className="block text-left w-full p-2 text-blue-700 hover:bg-blue-100"
+                        onClick={() => handleAddChildTag(childTag)}
                       >
                         {childTag}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -271,19 +308,42 @@ const CreateBlog = () => {
           {/* Display tags */}
           <div className="mt-2 flex flex-wrap gap-4">
             {tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-full"
-              >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(index)}
-                  className="ml-2 text-white rounded-full p-1"
+              <div>
+                <span
+                  // key={index}
+                  className="mr-3 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-full"
                 >
-                  ×
-                </button>
-              </span>
+                  {tag.tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(index)}
+                    className="ml-2 text-white rounded-full p-1"
+                  >
+                    ×
+                  </button>
+                </span>
+                {tag.childTags.length > 0 && (
+                  <div className="ml-5">
+                    {tag.childTags.map((childTag, childIndex) => (
+                      <span
+                        key={childIndex}
+                        className="mt-2 inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-green-500 rounded-full"
+                      >
+                        {childTag}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveChildTag(index, childIndex)
+                          }
+                          className="ml-1 text-white rounded-full p-1"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -328,7 +388,7 @@ const CreateBlog = () => {
             htmlFor="image"
             className="block text-lg font-medium text-gray-700"
           >
-            {isEditing ? "Update Blog Image" : "Upload Blog Image"}
+            Update Blog Image
           </label>
           <input
             type="file"
@@ -354,7 +414,7 @@ const CreateBlog = () => {
             type="submit"
             className="inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            {isEditing ? "Update Blog" : "Create Blog"}
+            Create Blog
           </button>
           {title && content && (
             <button

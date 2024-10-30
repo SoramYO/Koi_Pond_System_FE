@@ -1,71 +1,80 @@
-import { get, ref } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { db } from '../../firebase/FirebaseConfig';
-import Loading from './../../components/Loading';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Loading from "./../../components/Loading";
+import axios from "axios";
 const BlogDetail = () => {
-    const { id } = useParams(); // Retrieve id from URL
-    const [blog, setBlog] = useState(null);
-    const [loading, setLoading] = useState(false); // Loading state
+  const { id } = useParams(); // Retrieve id from URL
+  const [blog, setBlog] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
+  const predefinedTags = [
+    "Giống Cá Koi",
+    "Tính Năng Hồ",
+    "Yếu Tố Cung Hoàng Đạo",
+  ];
 
-    useEffect(() => {
-        const fetchBlog = async () => {
-            setLoading(true)
-            try {
-                const blogRef = ref(db, `blogs/${id}`); // Reference to the specific blog using the id
-                const snapshot = await get(blogRef); // Get the blog data
+  useEffect(() => {
+    const fetchBlog = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:8080/api/v1/blog/${id}`);
+        setBlog(res.data.advertisement);
+        console.log(blog.tags);
 
-                if (snapshot.exists()) {
-                    const blogData = snapshot.val();
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                    // Assuming blogData has a nested structure, access the first key
-                    const blogKey = Object.keys(blogData)[0]; // This gets the dynamic key (like "-O99WEzeCm-ElOEqFSeu")
+    fetchBlog();
+  }, [id]);
 
-                    // Now, access the actual blog data
-                    const { title, content, image, createdAt } = blogData[blogKey];
+  if (!blog) {
+    return <Loading />;
+  }
 
-                    setBlog({
-                        id: id, // Use the id from the URL
-                        title: title,
-                        content: content,
-                        image: image,
-                        createdAt: createdAt,
-                    });
-                } else {
-                    console.log("Blog not found.");
-                }
-            } catch (error) {
-                console.error("Error fetching blog: ", error);
-            } finally {
-                setLoading(false); // Stop loading after fetching
-            }
-        };
-
-        fetchBlog();
-    }, [id]);
-
-    if (!blog) {
-        return <Loading />;
-    }
-
-    return (
-        <div className="max-w-4xl mx-auto p-4">
-            {loading && <Loading />}
-            <h1 className="text-5xl font-bold mb-4">{blog.title}</h1>
-            {blog.image && (
-                <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="mb-4 w-full h-96 object-cover rounded"
-                />
-            )}
-            {/* Render blog content with HTML safely */}
-            <div
-                className="text-black-100 text-lg"
-                dangerouslySetInnerHTML={{ __html: blog.content }}
-            />
-        </div>
-    );
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      {loading && <Loading />}
+      <div>Blog</div>
+      <h4
+        className="text-5xl font-bold mb-4"
+        style={{ fontWeight: "400", fontSize: "24px" }}
+      >
+        {blog.title}
+      </h4>
+      {blog &&
+        blog?.tags.map((tag, index) => (
+          <>
+            <span
+              // key={index}
+              className="mr-3 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-full"
+            >
+              {tag.TargetType === "KoiFishBreeds"
+                ? "Giống Cá Koi"
+                : tag.TargetType === "ZodiacElements"
+                ? "Yếu Tố Cung Hoàng Đạo"
+                : "Tính Năng Hồ"}
+            </span>
+            <span
+              // key={index}
+              className="mr-3 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-full"
+            >
+              {tag.attribute_id.name}
+            </span>
+          </>
+        ))}
+      <div className="entry-divider is-divider small"></div>
+      {/* Render blog content with HTML safely */}
+      <div
+        className="text-black-100 text-lg"
+        dangerouslySetInnerHTML={{ __html: blog.content }}
+      />
+    </div>
+  );
 };
 
 export default BlogDetail;
