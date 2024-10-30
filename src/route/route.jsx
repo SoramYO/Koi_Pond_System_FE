@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "../layout/AdminLayout";
 import CustomerLayout from "../layout/CustomerLayout";
 import Services from "../pages//servicesDisplay";
-import AboutUs from "../pages/AboutUs";
 import AccountProfile from "../pages/AccountProfile";
 import CreateBlog from "../pages/Admin/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
@@ -15,7 +14,6 @@ import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
-
 import Register from "../pages/Register";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
@@ -27,6 +25,7 @@ import Earth from "../pages/Elements/Earth";
 import Fire from "../pages/Elements/Fire";
 import Water from "../pages/Elements/Water";
 import CreateDirection from "../pages/Admin/CreateDirection";
+import Introduction from "../pages/Introduction";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -77,7 +76,7 @@ export const routes = createBrowserRouter([
         element: <Services />,
         errorElement: <ErrorPage />,
       },
-      { path: "/about", element: <AboutUs />, errorElement: <ErrorPage /> },
+      { path: "/introduction", element: <Introduction />, errorElement: <ErrorPage /> },
       {
         path: "/elements/metal",
         element: <Metal />,

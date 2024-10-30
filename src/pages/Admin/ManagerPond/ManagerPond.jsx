@@ -3,7 +3,7 @@ import { Button, Col, Row, Space, Switch, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import Loading from "../../../components/Loading";
 
 const { Title } = Typography;

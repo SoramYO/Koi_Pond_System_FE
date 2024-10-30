@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import FormField from "../../components/FormField";
-import { storage } from "../../firebase/FirebaseConfig";
-import axiosInstance from "../../Axios/axiosInstance";
+import { db, storage } from "../../firebase/FirebaseConfig";
+import axiosInstance from "../../axios/axiosInstance";
 import Loading from "../../components/Loading";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
