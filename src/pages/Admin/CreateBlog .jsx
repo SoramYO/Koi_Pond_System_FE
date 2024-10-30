@@ -35,7 +35,7 @@ const CreateBlog = () => {
 
   const childTags = {
     [translateToVietnamese("pondFeature")]: pondFeature.map(
-      (feature) => feature.targetType + " " + feature.value
+      (feature) => feature.targetType + ":" + feature.value
     ),
     [translateToVietnamese("koiFishBreeds")]: koiFishBreeds.map(
       (breed) => breed.name

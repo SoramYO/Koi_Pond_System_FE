@@ -56,14 +56,14 @@ const BlogDetail = () => {
               {tag.TargetType === "KoiFishBreeds"
                 ? "Giống Cá Koi"
                 : tag.TargetType === "ZodiacElements"
-                ? "Yếu Tố Cung Hoàng Đạo"
-                : "Tính Năng Hồ"}
+                  ? "Yếu Tố Cung Hoàng Đạo"
+                  : "Tính Năng Hồ"}
             </span>
             <span
               // key={index}
               className="mr-3 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-full"
             >
-              {tag.attribute_id.name}
+              {tag.attribute_id.name ? tag.attribute_id.name : tag.attribute_id.targetType + " " + tag.attribute_id.value}
             </span>
           </>
         ))}
