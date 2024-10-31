@@ -3,8 +3,9 @@ import { Button, Col, Row, Space, Switch, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../axios/axiosInstance";
+import axiosInstance from "../../../Axios/axiosInstance";
 import Loading from "../../../components/Loading";
+import { format, parseISO } from "date-fns";
 
 const { Title } = Typography;
 
@@ -20,8 +21,8 @@ const ManagerPond = () => {
   const fetchPonds = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get("/pond/ponds");
-      setPonds(response.data);
+      const response = await axiosInstance.get("/pond-features");
+      setPonds(response.data.pondFeatures);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching ponds:", error);
@@ -50,44 +51,39 @@ const ManagerPond = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      render: (_, __, index) => index + 1,
+      key: "_id",
     },
     {
-      title: "Pond Name",
-      dataIndex: "pondName",
-      key: "pondName",
+      title: "Target Type",
+      dataIndex: "targetType",
+      key: "targetType",
     },
     {
-      title: "Description",
-      dataIndex: "decription",
-      key: "decription",
+      title: "Value",
+      dataIndex: "value",
+      key: "value",
     },
     {
-      title: "Depth (m)",
-      dataIndex: "pondDepth",
-      key: "pondDepth",
+      title: "Zodiac Name",
+      key: "zodiac_element.name",
+      render: (record) => record.zodiac_element?.name || "N/A",
     },
     {
-      title: "Area (m²)",
-      dataIndex: "area",
-      key: "area",
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "Shape",
-      dataIndex: "shape",
-      key: "shape",
+      title: "CreatedAt",
+      key: "createdAt",
+      render: (record) =>
+        format(parseISO(record.createdAt), "dd-MM-yyyy HH:mm:ss"),
     },
     {
       title: "Status",
-      dataIndex: "status",
       key: "status",
-      render: (status) => (status ? "Active" : "Inactive"),
+      render: (record) => (
+        <Switch
+          checked={record.status === "Active"}
+          onChange={() => handleStatusChange(record.id)}
+        />
+      ),
     },
     {
       title: "Actions",
@@ -101,10 +97,6 @@ const ManagerPond = () => {
           >
             Edit
           </Button>
-          <Switch
-            checked={record.status}
-            onChange={() => handleStatusChange(record.id)}
-          />
         </Space>
       ),
     },

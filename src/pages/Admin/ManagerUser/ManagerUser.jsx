@@ -4,8 +4,9 @@ import { Button, Col, Row, Space, Switch, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../axios/axiosInstance";
+import axiosInstance from "../../../Axios/axiosInstance";
 import Loading from "../../../components/Loading";
+import { format, parseISO } from "date-fns";
 const { Title } = Typography;
 const ManagerUser = () => {
   const [users, setUsers] = useState([]);
@@ -19,8 +20,8 @@ const ManagerUser = () => {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get("/account-manager/accounts");
-      setUsers(response.data.accounts);
+      const response = await axiosInstance.get("/users");
+      setUsers(response.data.users);
     } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
@@ -28,13 +29,13 @@ const ManagerUser = () => {
     }
   };
 
-  const handleStatusChange = async (username) => {
+  const handleStatusChange = async (id) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.put(
-        `/account-manager/users/${username}/status`
-      );
-      toast.success(response.data);
+      const response = await axiosInstance.patch(`/user/${id}/status`);
+      console.log(response);
+      
+      toast.success(response.data.message);
       fetchUsers();
     } catch (error) {
       toast.error("Failed to update status");
@@ -44,23 +45,29 @@ const ManagerUser = () => {
   };
 
   const columns = [
-    { title: "Id", dataIndex: "id", key: "id" },
-    { title: "Username", dataIndex: "userName", key: "userName" },
-    { title: "First Name", dataIndex: "firstName", key: "firstName" },
-    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+    { title: "Id", render: (_, __, index) => index + 1, key: "_id" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Phone", dataIndex: "phone", key: "phone" },
-    { title: "Birthday", dataIndex: "birthday", key: "birthday" },
+    { title: "First Name", dataIndex: "name", key: "name" },
+    {
+      title: "Birthday",
+      key: "birth",
+      render: (record) => format(parseISO(record.birth), "dd-MM-yyyy"),
+    },
     { title: "Gender", dataIndex: "gender", key: "gender" },
-    { title: "Role", dataIndex: "roleName", key: "roleName" },
+    {
+      title: "Zodiac Name",
+      render: (record) => record.zodiac_element?.name || "N/A",
+      key: "zodiac_element.name",
+    },
+    { title: "Role", dataIndex: "role", key: "role" },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status, record) => (
+      render: (record) => (
         <Switch
-          checked={status === true}
-          onChange={() => handleStatusChange(record.userName)}
+          checked={record.status === 'Active'}
+          onChange={() => handleStatusChange(record._id)}
         />
       ),
     },
@@ -105,7 +112,7 @@ const ManagerUser = () => {
       <Table
         dataSource={users}
         columns={columns}
-        rowKey="id"
+        rowKey="_id"
         pagination={{ pageSize: 5 }}
       />
     </div>

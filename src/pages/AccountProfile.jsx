@@ -2,7 +2,7 @@ import { EditOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { Button, Tabs, message } from "antd";
 
 import React, { useEffect, useState } from "react";
-import axiosInstance from "./../axios/axiosInstance";
+import axiosInstance from "../Axios/axiosInstance";
 
 const { TabPane } = Tabs;
 
