@@ -1,4 +1,13 @@
-import {Button, Form, Input, InputNumber, Select, Spin, Switch, Typography} from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Spin,
+  Switch,
+  Typography,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -23,8 +32,8 @@ const PondForm = () => {
   const fetchPondData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/pond/pond/${id}`);
-      form.setFieldsValue(response.data);
+      const response = await axiosInstance.get(`/get-pond-feature/${id}`);
+      form.setFieldsValue(response.data.pond);
     } catch (error) {
       console.error("Error fetching pond data:", error);
       toast.error("Failed to fetch pond data");
@@ -65,36 +74,18 @@ const PondForm = () => {
           initialValues={{ status: true }}
         >
           <Form.Item
-            name="pondName"
-            label="Pond Name"
+            name="targetType"
+            label="Target Type"
             rules={[{ required: true, message: "Please input the pond name!" }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item name="decription" label="Description">
-            <Input.TextArea />
-          </Form.Item>
-
           <Form.Item
-            name="pondDepth"
-            label="Pond Depth (m)"
-            rules={[
-              { required: true, message: "Please input the pond depth!" },
-            ]}
+            name="value"
+            label="Value"
+            rules={[{ required: true, message: "Please input the value!" }]}
           >
-            <InputNumber min={0} step={0.1} />
-          </Form.Item>
-
-          <Form.Item
-            name="area"
-            label="Area (m²)"
-            rules={[{ required: true, message: "Please input the area!" }]}
-          >
-            <InputNumber min={0} step={0.1} />
-          </Form.Item>
-
-          <Form.Item name="location" label="Location">
             <Input />
           </Form.Item>
 
@@ -107,7 +98,7 @@ const PondForm = () => {
           </Form.Item>
 
           <Form.Item name="status" label="Status" valuePropName="checked">
-            <Switch />
+            <Switch checked={form.getFieldValue("status") === "Active"}/>
           </Form.Item>
 
           <Form.Item>

@@ -82,10 +82,10 @@ const UserForm = () => {
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
             <Form.Item
-              name="userName"
-              label="Username"
+              name="email"
+              label="Email"
               rules={[
-                { required: true, message: "Please input the username!" },
+                { required: true, message: "Please input the email!" },
               ]}
             >
               <Input disabled={id} />
@@ -116,21 +116,6 @@ const UserForm = () => {
         </Row>
 
         <Row gutter={16}>
-          <Col xs={24} sm={12}>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                {
-                  required: true,
-                  type: "email",
-                  message: "Please input a valid email!",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
           <Col xs={24} sm={12}>
             <Form.Item
               name="phone"

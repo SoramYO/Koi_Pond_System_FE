@@ -81,7 +81,7 @@ const ManagerPond = () => {
       render: (record) => (
         <Switch
           checked={record.status === "Active"}
-          onChange={() => handleStatusChange(record.id)}
+          onChange={() => handleStatusChange(record._id)}
         />
       ),
     },
@@ -93,7 +93,7 @@ const ManagerPond = () => {
           <Button
             type="primary"
             icon={<EditOutlined />}
-            onClick={() => handleEdit(record.id)}
+            onClick={() => handleEdit(record._id)}
           >
             Edit
           </Button>
