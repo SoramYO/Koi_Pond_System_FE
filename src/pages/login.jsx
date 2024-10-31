@@ -32,6 +32,7 @@ const LoginPage = () => {
 
       if (res.data.user) {
         dispatch({ type: "LOGIN_SUCCESS", payload: res.data.user });
+        localStorage.setItem("access_token", res.data.user.accessToken);
         toast.success("Đăng nhập thành công!");
 
         // Store token based on "remember me"
