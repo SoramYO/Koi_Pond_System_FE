@@ -1,5 +1,14 @@
 import { EditOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Tabs, message } from "antd";
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Tabs,
+  message,
+} from "antd";
 
 import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../axios/axiosInstance";
@@ -9,8 +18,9 @@ import { CiWallet } from "react-icons/ci";
 import { format, parseISO } from "date-fns";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import moment from "moment/moment";
 
-const UserInfo = ({ user, showModal, showDepositModal }) => {
+const UserInfo = ({ user, showEditModal, showDepositModal }) => {
   return (
     <div className="p-4">
       <div className="bg-white shadow-md rounded-lg p-6">
@@ -39,7 +49,7 @@ const UserInfo = ({ user, showModal, showDepositModal }) => {
           <Button
             type="primary"
             icon={<EditOutlined />}
-            onClick={showModal}
+            onClick={showEditModal}
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
             Chỉnh sửa
@@ -62,8 +72,20 @@ const Profile = () => {
   const [form] = Form.useForm();
   const { user, dispatch } = useContext(AuthContext);
   const [isDepositModalVisible, setDepositModalVisible] = useState(false);
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isRefeshUser, setRefeshUser] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue({
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        birth: moment(user.birth),
+      });
+    }
+  }, [user, form]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -72,11 +94,11 @@ const Profile = () => {
         if (!user) {
           navigate("/login");
           message.error("Vui lòng đăng nhập để xem thông tin tài khoản.");
-          return
+          return;
         }
         const userId = user._id;
         const response = await axiosInstance.get(`/user/${userId}`);
-        
+
         dispatch({ type: "LOGIN_SUCCESS", payload: response.data.user });
         // setPonds(response.data.ponds);
         // setOrders(response.data.orders);
@@ -86,7 +108,7 @@ const Profile = () => {
     };
 
     fetchUserProfile();
-  }, [dispatch, isRefeshUser]);
+  }, [navigate, dispatch, isRefeshUser]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -109,8 +131,26 @@ const Profile = () => {
     }
   };
 
-  const showModal = () => {
-    // Implement modal logic here
+  const showEditModal = () => {
+    setEditModalVisible(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditModalVisible(false);
+  };
+
+  const handleEditSubmit = async (values) => {
+    try {
+      const userId = user._id;
+      console.log(values);
+      await axiosInstance.patch(`/user/${userId}`, values);
+
+      setRefeshUser(!isRefeshUser);
+      setEditModalVisible(false);
+      message.success("Thông tin cá nhân đã được cập nhật thành công!");
+    } catch (error) {
+      message.error("Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.");
+    }
   };
 
   const showDepositModal = () => {
@@ -146,7 +186,7 @@ const Profile = () => {
     <div className="container mx-auto">
       <UserInfo
         user={user}
-        showModal={showModal}
+        showEditModal={showEditModal}
         showDepositModal={showDepositModal}
       />
       <Tabs defaultActiveKey="1" className="mt-4">
@@ -178,6 +218,60 @@ const Profile = () => {
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
               Xác nhận nạp tiền
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        title="Chỉnh sửa thông tin cá nhân"
+        open={isEditModalVisible}
+        onCancel={handleEditCancel}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleEditSubmit}>
+          <Form.Item
+            name="name"
+            label="Tên"
+            initialValue={user.name}
+            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+          >
+            <Input placeholder="Nhập tên" />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            initialValue={user.email}
+            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+          >
+            <Input placeholder="Nhập email" />
+          </Form.Item>
+          <Form.Item
+            name="gender"
+            label="Giới tính"
+            initialValue={user.gender}
+            rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}
+          >
+            <Select placeholder="Chọn giới tính">
+              <Select.Option value="Male">Nam</Select.Option>
+              <Select.Option value="Female">Nữ</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="birth"
+            label="Ngày sinh"
+            rules={[{ required: true, message: "Vui lòng nhập ngày sinh!" }]}
+          >
+            <DatePicker
+              className="w-full rounded-md"
+              placeholder="Chọn ngày sinh"
+              format="DD-MM-YYYY"
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="w-full">
+              Cập nhật thông tin
             </Button>
           </Form.Item>
         </Form>
