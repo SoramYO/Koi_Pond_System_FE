@@ -14,17 +14,19 @@ import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
+
+import CreateDirection from "../pages/Admin/CreateDirection";
+import Earth from "../pages/Elements/Earth";
+import Fire from "../pages/Elements/Fire";
+import Water from "../pages/Elements/Water";
+import Wood from "../pages/Elements/Wood";
 import Register from "../pages/Register";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
 import BlogDetail from "./../pages/Blog/BlogDetail";
 import BlogList from "./../pages/Blog/BlogList";
 import Metal from "./../pages/Elements/Metal";
-import Wood from "../pages/Elements/Wood";
-import Earth from "../pages/Elements/Earth";
-import Fire from "../pages/Elements/Fire";
-import Water from "../pages/Elements/Water";
-import CreateDirection from "../pages/Admin/CreateDirection";
+import FengShui from "./../pages/FengShui";
 import Introduction from "../pages/Introduction";
 export const routes = createBrowserRouter([
   {
@@ -36,10 +38,9 @@ export const routes = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-
       {
-        path: "/blog",
-        element: <BlogList />,
+        path: "/feng-shui",
+        element: <FengShui />,
         errorElement: <ErrorPage />,
       },
       {
@@ -62,7 +63,7 @@ export const routes = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
-        path: "/signup",
+        path: "/register",
         element: <Register />,
         errorElement: <ErrorPage />,
       },
@@ -95,6 +96,16 @@ export const routes = createBrowserRouter([
       {
         path: "/elements/fire",
         element: <Fire />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/elements/earth",
+        element: <Earth />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/direction",
+        element: <CreateDirection />,
         errorElement: <ErrorPage />,
       },
       {
