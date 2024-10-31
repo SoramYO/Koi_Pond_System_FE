@@ -5,13 +5,7 @@ import axios from "axios";
 const BlogDetail = () => {
   const { id } = useParams(); // Retrieve id from URL
   const [blog, setBlog] = useState(null);
-  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false); // Loading state
-  const predefinedTags = [
-    "Giống Cá Koi",
-    "Tính Năng Hồ",
-    "Yếu Tố Cung Hoàng Đạo",
-  ];
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -19,7 +13,7 @@ const BlogDetail = () => {
       try {
         const res = await axios.get(`http://localhost:8080/api/v1/blog/${id}`);
         setBlog(res.data.advertisement);
-        console.log(blog.tags);
+        console.log(res.data.advertisement);
 
         setLoading(false);
       } catch (err) {
@@ -63,7 +57,11 @@ const BlogDetail = () => {
               // key={index}
               className="mr-3 inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-full"
             >
-              {tag.attribute_id.name ? tag.attribute_id.name : tag.attribute_id.targetType + " " + tag.attribute_id.value}
+              {tag.TargetType
+                ? tag.TargetType
+                : tag.attribute_id.name
+                  ? tag.attribute_id.name
+                  : tag.attribute_id.targetType + " " + tag.attribute_id.value}
             </span>
           </>
         ))}

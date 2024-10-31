@@ -4,231 +4,255 @@ import {
   FallOutlined,
   ProjectOutlined,
   RiseOutlined,
+  StarFilled,
   TeamOutlined,
   UserOutlined,
+  UserSwitchOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Progress, Row, Statistic, Table } from "antd";
+import { Card, Col, Progress, Row, Statistic, Table, Tag } from "antd";
 import React, { useEffect, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-const AdminDashboard = () => {
+import { LuFish, LuNewspaper, LuUser } from "react-icons/lu";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, } from "recharts";
+import axiosInstance from './../../axios/axiosInstance';
+const KoiFengShuiDashboard = () => {
   const [stats, setStats] = useState({
-    totalProjects: 0,
-    ongoingProjects: 0,
-    completedProjects: 0,
+    totalUsers: 0,
+    activeConsultations: 0,
+    completedConsultations: 0,
     totalRevenue: 0,
-    totalCosts: 0,
-    totalClients: 0,
-    totalEmployees: 0,
+    totalAds: 0,
+    premiumUsers: 0,
+    koiVarieties: 0,
+    averageRating: 0
   });
 
-  const [recentProjects, setRecentProjects] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
+  const [recentConsultations, setRecentConsultations] = useState([]);
+  const [elementDistribution, setElementDistribution] = useState([]);
+  const [monthlyStats, setMonthlyStats] = useState([]);
 
   useEffect(() => {
-    // Fetch data from your API here
-    // For now, we'll use mock data
+
+    // Mock data - sẽ được thay thế bằng API calls
+    const getData = async () => {
+      try {
+        const res = await axiosInstance.get("/revenew");
+        setStats(res.data.stats);
+        const res2 = await axiosInstance.get("/piechart");
+        setElementDistribution(res2.data.elementDistribution);
+        const res3 = await axiosInstance.get("/barchart");
+        setMonthlyStats(res3.data.monthlyStats);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     setStats({
-      totalProjects: 45,
-      ongoingProjects: 15,
-      completedProjects: 30,
-      totalRevenue: 1000000,
-      totalCosts: 500000,
-      totalClients: 40,
-      totalEmployees: 20,
+      activeConsultations: 45,
+      completedConsultations: 180,
+      totalRevenue: 75000000,
+      premiumUsers: 320,
+      averageRating: 4.8
     });
 
-    setRecentProjects([
+    setRecentConsultations([
       {
         id: 1,
-        name: "Hồ Koi Sân Vườn",
-        client: "Nguyễn Văn A",
-        status: "Đang tiến hành",
-        completion: 75,
+        userName: "Nguyễn Văn A",
+        element: "Kim",
+        koiType: "Kohaku",
+        status: "Hoàn thành",
+        compatibility: 95
       },
       {
         id: 2,
-        name: "Hồ Koi Mini",
-        client: "Trần Thị B",
-        status: "Hoàn thành",
-        completion: 100,
+        userName: "Trần Thị B",
+        element: "Mộc",
+        koiType: "Showa",
+        status: "Đang tư vấn",
+        compatibility: 85
       },
       {
         id: 3,
-        name: "Hồ Koi Biệt Thự",
-        client: "Lê Văn C",
-        status: "Lên kế hoạch",
-        completion: 10,
-      },
+        userName: "Phạm Văn C",
+        element: "Thủy",
+        koiType: "Sanke",
+        status: "Đang tư vấn",
+        compatibility: 90
+      }
     ]);
 
-    // Mock data for revenue per month
-    setRevenueData([
-      { month: "Tháng 1", revenue: 100000 },
-      { month: "Tháng 2", revenue: 150000 },
-      { month: "Tháng 3", revenue: 120000 },
-      { month: "Tháng 4", revenue: 170000 },
-      { month: "Tháng 5", revenue: 200000 },
-      { month: "Tháng 6", revenue: 250000 },
-      { month: "Tháng 7", revenue: 230000 },
-      { month: "Tháng 8", revenue: 220000 },
-      { month: "Tháng 9", revenue: 210000 },
-      { month: "Tháng 10", revenue: 240000 },
-      { month: "Tháng 11", revenue: 280000 },
-      { month: "Tháng 12", revenue: 300000 },
-    ]);
+    getData();
   }, []);
 
   const columns = [
-    { title: "Tên Dự Án", dataIndex: "name", key: "name" },
-    { title: "Khách Hàng", dataIndex: "client", key: "client" },
-    { title: "Trạng Thái", dataIndex: "status", key: "status" },
     {
-      title: "Tiến Độ",
-      dataIndex: "completion",
-      key: "completion",
-      render: (completion) => <Progress percent={completion} size="small" />,
+      title: "Khách Hàng",
+      dataIndex: "userName",
+      key: "userName"
     },
+    {
+      title: "Bản Mệnh",
+      dataIndex: "element",
+      key: "element",
+      render: (element) => {
+        const colors = {
+          Kim: "gold",
+          Mộc: "green",
+          Thủy: "blue",
+          Hỏa: "red",
+          Thổ: "brown"
+        };
+        return <Tag color={colors[element]}>{element}</Tag>;
+      }
+    },
+    {
+      title: "Loại Koi",
+      dataIndex: "koiType",
+      key: "koiType"
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={status === "Hoàn thành" ? "green" : "blue"}>{status}</Tag>
+      )
+    },
+    {
+      title: "Độ Phù Hợp",
+      dataIndex: "compatibility",
+      key: "compatibility",
+      render: (compatibility) => (
+        <Progress value={compatibility} className="w-full" />
+      )
+    }
   ];
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h1 className="text-2xl font-bold mb-6">Bảng Điều Khiển</h1>
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-8">Tổng Quan Hệ Thống Tư Vấn Koi Phong Thủy</h1>
 
-      <Row gutter={16}>
-        <Col span={6}>
+      {/* Thống kê tổng quan */}
+      <Row className="gap-6">
+        <Col className="flex-1">
           <Card>
-            <Statistic
-              title="Tổng Số Dự Án"
-              value={stats.totalProjects}
-              prefix={<ProjectOutlined />}
-            />
+            <div className="flex items-center gap-4">
+              <LuUser className="w-8 h-8 text-blue-500" />
+              <div>
+                <p className="text-sm text-gray-500">Tổng Người Dùng</p>
+                <p className="text-2xl font-bold">{stats.totalUsers}</p>
+              </div>
+            </div>
           </Card>
         </Col>
-        <Col span={6}>
+        <Col className="flex-1">
           <Card>
-            <Statistic
-              title="Dự Án Đang Tiến Hành"
-              value={stats.ongoingProjects}
-              prefix={<ClockCircleOutlined />}
-            />
+            <div className="flex items-center gap-4">
+              <LuFish className="w-8 h-8 text-green-500" />
+              <div>
+                <p className="text-sm text-gray-500">Loại Koi</p>
+                <p className="text-2xl font-bold">{stats.koiVarieties}</p>
+              </div>
+            </div>
           </Card>
         </Col>
-        <Col span={6}>
+        <Col className="flex-1">
           <Card>
-            <Statistic
-              title="Dự Án Hoàn Thành"
-              value={stats.completedProjects}
-              prefix={<RiseOutlined />}
-            />
+            <div className="flex items-center gap-4">
+              <LuNewspaper className="w-8 h-8 text-purple-500" />
+              <div>
+                <p className="text-sm text-gray-500">Tin Đăng</p>
+                <p className="text-2xl font-bold">{stats.totalAds}</p>
+              </div>
+            </div>
           </Card>
         </Col>
-        <Col span={6}>
+        <Col className="flex-1">
           <Card>
-            <Statistic
-              title="Tổng Doanh Thu"
-              value={stats.totalRevenue}
-              prefix={<DollarOutlined />}
-              precision={0}
-              suffix="VNĐ"
-            />
+            <div className="flex items-center gap-4">
+              <StarFilled className="w-8 h-8 text-yellow-500" />
+              <div>
+                <p className="text-sm text-gray-500">Đánh Giá TB</p>
+                <p className="text-2xl font-bold">{stats.averageRating}/5</p>
+              </div>
+            </div>
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={16} className="mt-4">
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Tổng Chi Phí"
-              value={stats.totalCosts}
-              prefix={<FallOutlined />}
-              precision={0}
-              suffix="VNĐ"
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Tổng Số Khách Hàng"
-              value={stats.totalClients}
-              prefix={<TeamOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Tổng Số Nhân Viên"
-              value={stats.totalEmployees}
-              prefix={<UserOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <h2 className="text-xl font-semibold mt-8 mb-4">Dự Án Gần Đây</h2>
-      <Table dataSource={recentProjects} columns={columns} />
-
-      <Row gutter={16} className="mt-8">
-        <Col span={12}>
-          <Card title="Phân Bố Trạng Thái Dự Án">
-            <Progress
-              percent={(stats.ongoingProjects / stats.totalProjects) * 100}
-              success={{
-                percent: (stats.completedProjects / stats.totalProjects) * 100,
-              }}
-              type="dashboard"
-              format={() => "Đang tiến hành"}
-            />
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card title="Mức Độ Hài Lòng Của Khách Hàng">
-            <Progress
-              percent={90}
-              success={{ percent: 90 }}
-              type="dashboard"
-              format={(percent) => `${percent}%`}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <h2 className="text-xl font-semibold mt-8 mb-4">
-        Biểu Đồ Doanh Thu Hàng Tháng
-      </h2>
-      <Row gutter={16} className="mt-4">
-        <Col span={24}>
-          <Card>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart
-                data={revenueData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+      {/* Biểu đồ và bảng */}
+      <div className="mt-8 grid grid-cols-2 gap-6">
+        <Card className="col-span-1">
+          <h2 className="text-xl font-semibold mb-4">Phân Bố Ngũ Hành</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={elementDistribution}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="revenue" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-      </Row>
+                {elementDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+
+        <Card className="col-span-1">
+          <h2 className="text-xl font-semibold mb-4">Thống Kê Theo Tháng</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={monthlyStats}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="consultations" name="Lượt Tư Vấn" fill="#8884d8" />
+              <Bar dataKey="revenue" name="Doanh Thu" fill="#82ca9d" />
+              <Bar dataKey="ads" name="Tin Đăng" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
+
+      {/* Bảng tư vấn gần đây */}
+      <Card className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Tư Vấn Gần Đây</h2>
+        <Table columns={columns} dataSource={recentConsultations} />
+      </Card>
+
+      {/* Thống kê chi tiết */}
+      <div className="mt-8 grid grid-cols-2 gap-6">
+        <Card className="col-span-1">
+          <h2 className="text-xl font-semibold mb-4">Tỷ Lệ Hoàn Thành Tư Vấn</h2>
+          <div className="flex justify-center">
+            <Progress
+              value={(stats.completedConsultations / (stats.activeConsultations + stats.completedConsultations)) * 100}
+              size="lg"
+              className="w-64 h-64"
+            />
+          </div>
+        </Card>
+
+        <Card className="col-span-1">
+          <h2 className="text-xl font-semibold mb-4">Người Dùng Premium</h2>
+          <div className="flex justify-center">
+            <Progress
+              value={(stats.premiumUsers / stats.totalUsers) * 100}
+              size="lg"
+              className="w-64 h-64"
+            />
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default KoiFengShuiDashboard;

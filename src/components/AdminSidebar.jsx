@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useContext } from "react";
 import { FiFileText, FiHome, FiLogOut, FiUsers } from "react-icons/fi"; // Import icons
 import { SiSpond } from "react-icons/si";
+import { LuFish } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
@@ -45,6 +46,13 @@ const AdminSidebar = () => {
         >
           <SiSpond className="mr-2" /> {/* Projects icon */}
           Pond
+        </a>
+        <a
+          href="/admin/manager-fish"
+          className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
+        >
+          <LuFish className="mr-2" /> {/* Projects icon */}
+          Fish
         </a>
 
         {/* Blog link */}

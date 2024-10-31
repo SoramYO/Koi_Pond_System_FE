@@ -1,10 +1,9 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { onChildAdded, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "../../firebase/FirebaseConfig";
 import axios from "axios";
+import Loading from "../../components/Loading";
 
 const ManagerBlog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -31,6 +30,10 @@ const ManagerBlog = () => {
     navigate(`/admin/edit-blog/${blogId}`);
   };
 
+  if (loading) {
+    return <Loading />
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
@@ -45,10 +48,10 @@ const ManagerBlog = () => {
       </Button>
       {blogs.length === 0 ? (
         <p className="text-center text-gray-600">
-          No blogs found.
           <Button
             icon={<EditOutlined />}
             onClick={() => navigate(`/admin/create-blog`)}
+            className="mb-4"
           >
             Create a new one!
           </Button>

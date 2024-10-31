@@ -14,7 +14,6 @@ import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
 import HomePage from "../pages/homePage";
 import Login from "../pages/login";
-
 import CreateDirection from "../pages/Admin/CreateDirection";
 import Earth from "../pages/Elements/Earth";
 import Fire from "../pages/Elements/Fire";
@@ -24,10 +23,12 @@ import Register from "../pages/Register";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
 import BlogDetail from "./../pages/Blog/BlogDetail";
-import BlogList from "./../pages/Blog/BlogList";
 import Metal from "./../pages/Elements/Metal";
 import FengShui from "./../pages/FengShui";
 import Introduction from "../pages/Introduction";
+import BlogList from './../pages/Blog/BlogList';
+import ManagerKoiFish from "../pages/Admin/ManagerKoiFish/ManagerKoiFish";
+import FishForm from "../pages/Admin/ManagerKoiFish/FishForm";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -51,6 +52,11 @@ export const routes = createBrowserRouter([
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage />,
+      },
+      {
+        path: "/blog",
+        element: <BlogList />,
+        ErrorPage: <ErrorPage />,
       },
       {
         path: "/blog/:id",
@@ -173,6 +179,19 @@ export const routes = createBrowserRouter([
         path: "edit-pond/:id",
         element: <PondForm />,
       },
+      {
+        path: "manager-fish",
+        element: <ManagerKoiFish />,
+      },
+      {
+        path: "add-koi-fish",
+        element: <FishForm />,
+      },
+      {
+        path: "edit-koi-fish/:id",
+        element: <FishForm />
+      },
+
     ],
   },
   {

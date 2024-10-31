@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import FormField from "../../components/FormField";
-import { db, storage } from "../../firebase/FirebaseConfig";
-import axiosInstance from "../../Axios/axiosInstance";
+import { storage } from "../../firebase/FirebaseConfig";
+import axiosInstance from "../../axios/axiosInstance";
 import Loading from "../../components/Loading";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
@@ -367,15 +367,65 @@ const CreateBlog = () => {
             value={content}
             init={{
               height: 500,
-              menubar: false,
+              menubar: true, // Enable menubar for additional options
               plugins: [
-                "advlist autolink lists link image charmap print preview anchor",
-                "searchreplace visualblocks code fullscreen",
-                "insertdatetime media table paste code help wordcount",
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+                'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime',
+                'media', 'table', 'paste', 'code', 'help', 'wordcount', 'emoticons',
+                'codesample', 'hr', 'pagebreak', 'nonbreaking', 'toc', 'imagetools',
+                'textpattern', 'noneditable', 'template', 'save', 'directionality',
+                'visualchars', 'quickbars'
               ],
-              toolbar: `undo redo | formatselect | bold italic backcolor | 
-                                      alignleft aligncenter alignright alignjustify | 
-                                      bullist numlist outdent indent | removeformat | help`,
+              toolbar1: `undo redo | formatselect | bold italic underline strikethrough | 
+              alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |
+              forecolor backcolor | link image media | removeformat code fullscreen help`,
+              toolbar2: `styleselect | blocks | fontfamily fontsize | paste pastetext | emoticons hr | 
+              table tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | 
+              tableinsertcolbefore tableinsertcolafter tabledeletecol`,
+              toolbar_mode: 'sliding', // Enable toolbar sliding for better mobile experience
+              block_formats: 'Paragraph=p; Header 1=h1; Header 2=h2; Header 3=h3; Header 4=h4; Header 5=h5; Header 6=h6; Quote=blockquote; Code=code',
+              fontsize_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+              style_formats: [
+                {
+                  title: 'Headings', items: [
+                    { title: 'Heading 1', format: 'h1' },
+                    { title: 'Heading 2', format: 'h2' },
+                    { title: 'Heading 3', format: 'h3' }
+                  ]
+                },
+                {
+                  title: 'Inline', items: [
+                    { title: 'Bold', format: 'bold' },
+                    { title: 'Italic', format: 'italic' },
+                    { title: 'Underline', format: 'underline' },
+                    { title: 'Strikethrough', format: 'strikethrough' },
+                    { title: 'Code', format: 'code' }
+                  ]
+                },
+                {
+                  title: 'Blocks', items: [
+                    { title: 'Paragraph', format: 'p' },
+                    { title: 'Blockquote', format: 'blockquote' },
+                    { title: 'Code Block', format: 'pre' }
+                  ]
+                }
+              ],
+              content_style: `
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; }
+      code { background-color: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+      blockquote { border-left: 3px solid #ccc; margin-left: 1.5em; padding-left: 1em; }
+    `,
+              image_advtab: true,
+              paste_data_images: true,
+              automatic_uploads: true,
+              file_picker_types: 'image',
+              quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
+              contextmenu: 'link image table',
+              browser_spellcheck: true,
+              resize: true,
+              autosave_interval: '30s',
+              autosave_prefix: 'tinymce-autosave-{path}{query}-{id}-',
+              autosave_restore_when_empty: true,
             }}
             onEditorChange={(newContent) =>
               setFormData((prevData) => ({ ...prevData, content: newContent }))

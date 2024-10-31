@@ -1,14 +1,5 @@
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Spin,
-  Switch,
-  Typography,
-} from "antd";
 import React, { useEffect, useState } from "react";
+import { Button, Form, Input, Select, Spin, Switch, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../Axios/axiosInstance";
@@ -19,24 +10,51 @@ const { Option } = Select;
 const PondForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [pondFeatures, setPondFeatures] = useState([]);
+  const [zodiacElements, setZodiacElements] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = !!id;
+  const [formData, setFormData] = useState({
+    targetType: "",
+    value: "",
+    zodiac_element: "",
+    status: false, // Initialize with false (Inactive)
+  });
 
   useEffect(() => {
+    fetchZodiacElements();
     if (isEditing) {
-      fetchPondData();
+      fetchData();
+    } else {
+      form.setFieldsValue({ status: false });
     }
   }, [id]);
 
-  const fetchPondData = async () => {
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance.get(`/pond-feature/${id}`);
+      const data = {
+        ...response.data.pondFeature,
+        zodiac_element: response.data.pondFeature.zodiac_element._id,
+        status: response.data.pondFeature.status === "Active",
+      };
+      form.setFieldsValue(data);
+      setPondFeatures(response.data.pondFeature);
+    } catch (error) {
+      console.error("Error fetching zodiac elements:", error);
+      toast.error("Failed to fetch zodiac elements");
+    }
+  };
+
+  const fetchZodiacElements = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/get-pond-feature/${id}`);
-      form.setFieldsValue(response.data.pond);
+      const response = await axiosInstance.get(`/zodiac-elements`);
+      setZodiacElements(response.data.zodiacs);
     } catch (error) {
-      console.error("Error fetching pond data:", error);
-      toast.error("Failed to fetch pond data");
+      console.error("Error fetching data:", error);
+      toast.error("Failed to fetch data");
     } finally {
       setLoading(false);
     }
@@ -45,40 +63,49 @@ const PondForm = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
+      const data = {
+        ...values,
+        status: values.status ? "Active" : "Inactive",
+      };
       if (isEditing) {
-        await axiosInstance.put(`/pond/pond/${id}`, values);
-        toast.success("Pond updated successfully");
+        console.log("data", data);
+        await axiosInstance.patch(`/pond-feature/${id}`, data);
+        toast.success("Updated successfully");
       } else {
-        await axiosInstance.post("/pond/ponds", values);
-        toast.success("Pond created successfully");
+        await axiosInstance.post("/pond-feature", data);
+        toast.success("Created successfully");
       }
-      navigate("/ponds");
+      navigate("/admin/manager-pond");
     } catch (error) {
-      console.error("Error saving pond:", error);
-      toast.error("Failed to save pond");
+      console.error("Error saving:", error);
+      toast.error("Failed to save");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Title level={2}>{isEditing ? "Edit Pond" : "Add New Pond"}</Title>
+    <div className="p-6">
+      <Title level={2} className="mb-6">
+        {isEditing ? "Edit Zodiac" : "Add New Zodiac"}
+      </Title>
       {loading ? (
-        <Spin size="large" />
+        <div className="flex justify-center">
+          <Spin size="large" />
+        </div>
       ) : (
         <Form
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          initialValues={{ status: true }}
+          className="max-w-2xl"
         >
           <Form.Item
             name="targetType"
             label="Target Type"
-            rules={[{ required: true, message: "Please input the pond name!" }]}
+            rules={[{ required: true, message: "Please input the target type!" }]}
           >
-            <Input />
+            <Input className="w-full" />
           </Form.Item>
 
           <Form.Item
@@ -86,28 +113,46 @@ const PondForm = () => {
             label="Value"
             rules={[{ required: true, message: "Please input the value!" }]}
           >
-            <Input />
+            <Input className="w-full" />
           </Form.Item>
 
-          <Form.Item name="shape" label="Shape">
-            <Select>
-              <Option value="rectangular">Rectangular</Option>
-              <Option value="circular">Circular</Option>
-              <Option value="irregular">Irregular</Option>
+          <Form.Item
+            name="zodiac_element"
+            label="Zodiac Element"
+            rules={[{ required: true, message: "Please select a zodiac element!" }]}
+          >
+            <Select className="w-full">
+              {zodiacElements.map((element) => (
+                <Option key={element._id} value={element._id}>
+                  {element.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
-          <Form.Item name="status" label="Status" valuePropName="checked">
-            <Switch checked={form.getFieldValue("status") === "Active"}/>
+          <Form.Item
+            name="status"
+            label="Status"
+            valuePropName="checked"
+          >
+            <Switch
+              checkedChildren="Active"
+              unCheckedChildren="Inactive"
+              defaultChecked={formData.status}
+            />
           </Form.Item>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              {isEditing ? "Update" : "Create"} Pond
+          <Form.Item className="flex justify-start gap-4">
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              {isEditing ? "Update" : "Create"}
             </Button>
             <Button
-              style={{ marginLeft: 8 }}
               onClick={() => navigate("/admin/manager-pond")}
+              className="hover:bg-gray-100"
             >
               Cancel
             </Button>
