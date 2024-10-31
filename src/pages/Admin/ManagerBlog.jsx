@@ -1,10 +1,9 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import { onChildAdded, ref } from "firebase/database";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "../../firebase/FirebaseConfig";
-import axios from "axios";
+import Loading from "../../components/Loading";
 
 const ManagerBlog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -31,20 +30,31 @@ const ManagerBlog = () => {
     navigate(`/admin/edit-blog/${blogId}`);
   };
 
+  if (loading) {
+    return <Loading />
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
         Blog List
       </h2>
+      <Button
+        icon={<EditOutlined />}
+        onClick={() => navigate(`/admin/create-blog`)}
+        className="mb-4"
+      >
+        Create a new one!
+      </Button>
       {blogs.length === 0 ? (
         <p className="text-center text-gray-600">
-          No blogs found.
-          <button
-            onClick={() => navigate("/admin/create-blog")}
-            className="text-blue-500 underline"
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/admin/create-blog`)}
+            className="mb-4"
           >
             Create a new one!
-          </button>
+          </Button>
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

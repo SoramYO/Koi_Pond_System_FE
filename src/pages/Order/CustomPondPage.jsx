@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../Axios/axiosInstance";
+import axiosInstance from "../../axios/axiosInstance";
 import PondAreaCalculator from "../../components/Calculate/PondAreaCalculator";
 import ComponentsSelection from "../../components/ComponentsSelection";
 import Loading from "../../components/Loading";

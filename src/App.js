@@ -2,6 +2,7 @@ import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { routes } from "./route/route";
+import "./App.css";
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
       <RouterProvider router={routes} />
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Loading from "../components/Loading";
-import axiosInstance from "./../Axios/axiosInstance";
+import axiosInstance from "./../axios/axiosInstance";
 
 const PondDetail = () => {
   const { id } = useParams();

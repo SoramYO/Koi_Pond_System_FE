@@ -43,7 +43,6 @@ const LoginPage = () => {
         const roleRoutes = {
           Admin: "/admin",
         };
-
         navigate(roleRoutes[res.data.user.role] || "/");
       }
     } catch (err) {
