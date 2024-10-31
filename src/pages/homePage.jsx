@@ -1,9 +1,10 @@
 import React from "react";
 
 import { Card } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const elements = [
     {
       name: "Kim",
@@ -43,7 +44,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white font-sans overflow-hidden">
       {/* Hero Section with Eastern Aesthetic */}
       <section className="relative py-20 px-4">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-white to-pink-100 opacity-50"></div>
@@ -56,7 +57,7 @@ const HomePage = () => {
             <br />
             Khám phá sự hòa hợp thông qua trí tuệ cổ xưa và chuyên môn hiện đại.
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <button onClick={() => navigate('/consultation')} className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
             Bắt đầu ngay
           </button>
         </div>
@@ -136,7 +137,7 @@ const HomePage = () => {
             chuyên môn của chúng tôi. Chúng tôi sẽ giúp bạn chọn các đặc điểm ao
             và cá Koi lý tưởng dựa trên yếu tố của bạn.
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <button onClick={() => navigate('/consultation')} className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
             Đặt lịch hẹn
           </button>
         </div>

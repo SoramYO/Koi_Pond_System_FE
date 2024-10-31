@@ -6,6 +6,7 @@ import { LuFish } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/authContext";
+import { FaHeadphonesAlt, FaHeadset } from "react-icons/fa";
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
@@ -30,7 +31,14 @@ const AdminSidebar = () => {
           <FiHome className="mr-2" /> {/* Home icon for Dashboard */}
           Dashboard
         </a>
-
+        {/* Consultation */}
+        <a
+          href="/admin/manage-consultation"
+          className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
+        >
+          <FaHeadset className="mr-2" /> {/* Consultation icon */}
+          Consultation
+        </a>
         {/* Users link */}
         <a
           href="/admin/manage-users"

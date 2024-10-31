@@ -1,14 +1,4 @@
-import {
-  ClockCircleOutlined,
-  DollarOutlined,
-  FallOutlined,
-  ProjectOutlined,
-  RiseOutlined,
-  StarFilled,
-  TeamOutlined,
-  UserOutlined,
-  UserSwitchOutlined,
-} from "@ant-design/icons";
+import {StarFilled,} from "@ant-design/icons";
 import { Card, Col, Progress, Row, Statistic, Table, Tag } from "antd";
 import React, { useEffect, useState } from "react";
 import { LuFish, LuNewspaper, LuUser } from "react-icons/lu";

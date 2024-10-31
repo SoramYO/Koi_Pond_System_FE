@@ -56,7 +56,7 @@ const Introduction = () => {
                     "Nuôi cá dưỡng tâm, nuôi chim dưỡng chí, nuôi cây dưỡng thần"
                 </Paragraph>
                 <div className="flex justify-center gap-4">
-                    <Button type="primary" size="large" className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={() => navigate('/consultation')} type="primary" size="large" className="bg-blue-600 hover:bg-blue-700">
                         <FontAwesomeIcon icon={faCompass} className="mr-2" />
                         Tư Vấn Ngay
                     </Button>
