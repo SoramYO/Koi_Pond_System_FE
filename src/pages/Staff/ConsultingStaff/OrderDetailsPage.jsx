@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import { calculateOrderTotal } from "../../../components/Calculate/PondAreaCalculator";
 import Loading from "../../../components/Loading";
 import ChatPanel from "./../../../components/ChatPanel";

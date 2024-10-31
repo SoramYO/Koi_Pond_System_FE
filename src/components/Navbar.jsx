@@ -1,20 +1,21 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, Transition } from '@headlessui/react';
-import { toast } from 'react-toastify';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faHome,
+  faBlog,
   faBook,
   faCompass,
-  faNewspaper,
-  faBlog,
-  faUser,
   faCreditCard,
-  faSignOutAlt
+  faHome,
+  faNewspaper,
+  faRectangleAd,
+  faSignOutAlt,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
-import { AuthContext } from '../context/authContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Menu, Transition } from '@headlessui/react';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import logo from '../assets/images/logo.webp';
+import { AuthContext } from '../context/authContext';
 
 const NavLink = ({ to, children, icon }) => (
   <Link
@@ -42,6 +43,7 @@ const Navbar = () => {
     { label: "Feng Shui", to: "/feng-shui", icon: faCompass },
     { label: "News", to: "/news", icon: faNewspaper },
     { label: "Blog", to: "/blog", icon: faBlog },
+    {label : "Package" ,to : "/package", icon: faRectangleAd}
   ];
 
   return (

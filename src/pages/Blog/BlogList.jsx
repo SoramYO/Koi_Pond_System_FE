@@ -12,7 +12,6 @@ const BlogList = () => {
       try {
         const res = await axios.get("http://localhost:8080/api/v1/blogs");
         setBlogs(res.data.advertisements);
-        console.log(res.data.advertisements);
       } catch (err) {
         console.error(err);
       } finally {
@@ -22,7 +21,6 @@ const BlogList = () => {
     fetchBlogs();
   }, []);
 
-  console.log(blogs);
 
   if (loading) {
     return <Loading />;
@@ -41,8 +39,8 @@ const BlogList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((blog) => (
             <Link
-              key={blog.id}
-              to={`/blog/${blog.id}`} // This is correct
+              key={blog._id}
+              to={`/blog/${blog._id}`} // This is correct
               className="border p-4 rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
             >
               <div className="flex flex-col">
@@ -56,7 +54,6 @@ const BlogList = () => {
                     className="h-40 w-full object-cover rounded-md mb-4"
                   />
                 )}
-                {/* Render blog content safely with HTML */}
                 <div
                   className="text-gray-600 line-clamp-3"
                   dangerouslySetInnerHTML={{ __html: blog.content }}

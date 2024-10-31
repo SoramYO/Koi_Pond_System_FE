@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Background from "../assets/images/project1-2.jpg";
 import Loading from "../components/Loading";
-import axiosInstance from "./../Axios/axiosInstance";
+import axiosInstance from "./../axios/axiosInstance";
 
 const HeroSection = () => (
   <section

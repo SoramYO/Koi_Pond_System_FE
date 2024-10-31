@@ -6,6 +6,17 @@
   height: 40vmin;
   pointer-events: none;
 }
+.row.row-large {
+  max-width: 1200px;
+}
+.is-divider {
+  height: 3px;
+  display: block;
+  background-color: rgba(0, 0, 0, .1);
+  margin: 1em 0 1em;
+  width: 100%;
+  max-width: 30px;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

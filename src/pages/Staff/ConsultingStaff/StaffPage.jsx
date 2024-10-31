@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import OrdersList from "./../../../components/OrdersList";
 
 const StaffPage = () => {

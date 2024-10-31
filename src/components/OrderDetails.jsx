@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axiosInstance from "../Axios/axiosInstance";
+import axiosInstance from "../axios/axiosInstance";
 import { calculatePriceByArea } from "../components/Calculate/PondAreaCalculator";
 import ComponentsSelection from "./ComponentsSelection";
 import Loading from "./Loading";
