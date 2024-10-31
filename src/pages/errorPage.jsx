@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/images/logo.png"; // Ensure this path is correct
+import logo from "../assets/images/logo.webp";
 
 const ErrorPage = ({ statusCode = 404, message = "Trang không tồn tại" }) => {
   return (

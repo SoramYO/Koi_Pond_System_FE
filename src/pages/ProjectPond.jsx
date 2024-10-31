@@ -28,7 +28,7 @@ const ProjectPond = () => {
     setIsLoading(true);
     const fetchPonds = async () => {
       try {
-        const response = await axiosInstance.get("/pond/ponds");
+        const response = await axiosInstance.get("/display/ponds-display");
         setPonds(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu hồ cá koi:", error);
@@ -48,29 +48,26 @@ const ProjectPond = () => {
         <section id="ho-ca-koi" className="mt-12">
           <h3 className="font-bold text-4xl text-center mb-8">Các Hồ Cá Koi</h3>
           <div className="flex justify-center flex-wrap mb-20">
-            {ponds.map(
-              (pond) =>
-                pond.sampleType && (
-                  <div
-                    key={pond.id}
-                    className="flex justify-center"
-                    style={{ margin: "10px 15px" }}
-                  >
-                    <Link to={`/pond/${pond.id}`} className="relative block">
-                      <img
-                        src={pond.designImage}
-                        alt={pond.pondName}
-                        className="rounded-lg object-cover h-[380px] w-[380px] transition-transform duration-300 hover:scale-105"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100 rounded-lg">
-                        <h4 className="font-semibold text-white text-lg">
-                          {pond.pondName}
-                        </h4>
-                      </div>
-                    </Link>
+            {ponds.map((pond) => (
+              <div
+                key={pond.id}
+                className="flex justify-center"
+                style={{ margin: "10px 15px" }}
+              >
+                <Link to={`/pond/${pond.id}`} className="relative block">
+                  <img
+                    src={pond.designImage}
+                    alt={pond.pondName}
+                    className="rounded-lg object-cover h-[380px] w-[380px] transition-transform duration-300 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100 rounded-lg">
+                    <h4 className="font-semibold text-white text-lg">
+                      {pond.pondName}
+                    </h4>
                   </div>
-                )
-            )}
+                </Link>
+              </div>
+            ))}
           </div>
         </section>
       </main>
