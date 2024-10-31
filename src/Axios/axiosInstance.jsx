@@ -11,8 +11,7 @@ axiosInstance.interceptors.request.use(
     const path = new URL(config.baseURL + config.url).pathname;
     const requiresAuth = !authRequired.some((url) => path.startsWith(url));
     if (requiresAuth) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const token = user.accessToken;
+      const token = localStorage.getItem("access_token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

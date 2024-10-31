@@ -14,6 +14,7 @@ const AdminSidebar = () => {
     const res = await axios.post(
       "http://localhost:5222/api/v1/authenticate/logout"
     );
+    localStorage.removeItem("access_token");
     toast.success(res.data.message);
     navigate("/login");
   };

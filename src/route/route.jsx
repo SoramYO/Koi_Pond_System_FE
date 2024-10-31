@@ -90,6 +90,11 @@ export const routes = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
+        path: "/profile",
+        element: <AccountProfile />,
+        errorElement: <ErrorPage />,
+      },
+      {
         path: "/elements/wood",
         element: <Wood />,
         errorElement: <ErrorPage />,
