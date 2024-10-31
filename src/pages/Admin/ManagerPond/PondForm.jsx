@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Select, Spin, Switch, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 
 const { Title } = Typography;
 const { Option } = Select;

@@ -15,7 +15,7 @@ import {
 import { UserOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import Loading from "../../../components/Loading";
 import moment from 'moment';
 
