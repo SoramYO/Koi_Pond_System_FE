@@ -3,9 +3,9 @@ import AdminLayout from "../layout/AdminLayout";
 import CustomerLayout from "../layout/CustomerLayout";
 import Services from "../pages//servicesDisplay";
 import AccountProfile from "../pages/AccountProfile";
-import CreateBlog from "../pages/Admin/CreateBlog ";
+import CreateBlog from "../pages/Admin/ManagerBlog/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
-import ManagerBlog from "../pages/Admin/ManagerBlog";
+import ManagerBlog from "../pages/Admin/ManagerBlog/ManagerBlog";
 import PondForm from "../pages/Admin/ManagerPond/PondForm";
 import ManagerUser from "../pages/Admin/ManagerUser/ManagerUser";
 import UserForm from "../pages/Admin/ManagerUser/UserForm";
@@ -31,6 +31,9 @@ import ManagerKoiFish from "../pages/Admin/ManagerKoiFish/ManagerKoiFish";
 import FishForm from "../pages/Admin/ManagerKoiFish/FishForm";
 import Billing from "../pages/Billing";
 import EditBlog from "../pages/Admin/EditBlog";
+import Consultation from "../pages/Consultation";
+import ManagerConsultation from "../pages/Admin/ManagerConsultation/ManagerConsultation";
+import ChatPanel from "../components/ChatPanel";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -47,10 +50,10 @@ export const routes = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
-        path: "/contact",
+        path: "/consultation",
         element: (
-          <ProtectedRoute requiredRoles={["Customer"]}>
-            <ChatWindow />
+          <ProtectedRoute requiredRoles={["User"]}>
+            <Consultation />
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage />,
@@ -203,13 +206,20 @@ export const routes = createBrowserRouter([
         path: "edit-koi-fish/:id",
         element: <FishForm />
       },
-
+      {
+        path: "manage-consultation",
+        element: <ManagerConsultation />,
+      },
+      {
+        path: "consultation/:id",
+        element: <ChatPanel />,
+      },
     ],
   },
   {
     path: "/customer",
     element: (
-      <ProtectedRoute requiredRoles={["Customer"]}>
+      <ProtectedRoute requiredRoles={["User"]}>
         <CustomerLayout />
       </ProtectedRoute>
     ),

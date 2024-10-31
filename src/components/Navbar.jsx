@@ -91,8 +91,8 @@ const Navbar = () => {
                   <span className="text-sm font-medium hidden md:block">
                     {user.name}
                   </span>
-                  <span className="border border-gray-300 rounded px-2 py-1">
-                    <CiWallet />{" "}
+                  <span className="flex justify-center items-center border border-gray-300 rounded px-2 py-1">
+                    <CiWallet className="mr-2" />{" "}
                     {new Intl.NumberFormat("vi-VN").format(user?.balance)}đ
                   </span>
                 </Menu.Button>
@@ -110,9 +110,8 @@ const Navbar = () => {
                       {({ active }) => (
                         <Link
                           to="/profile"
-                          className={`${
-                            active ? "bg-gray-100" : ""
-                          } flex items-center gap-2 px-4 py-2 text-sm text-gray-700`}
+                          className={`${active ? "bg-gray-100" : ""
+                            } flex items-center gap-2 px-4 py-2 text-sm text-gray-700`}
                         >
                           <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
                           Profile
@@ -123,9 +122,8 @@ const Navbar = () => {
                       {({ active }) => (
                         <Link
                           to="/billing"
-                          className={`${
-                            active ? "bg-gray-100" : ""
-                          } flex items-center gap-2 px-4 py-2 text-sm text-gray-700`}
+                          className={`${active ? "bg-gray-100" : ""
+                            } flex items-center gap-2 px-4 py-2 text-sm text-gray-700`}
                         >
                           <FontAwesomeIcon
                             icon={faCreditCard}
@@ -139,9 +137,8 @@ const Navbar = () => {
                       {({ active }) => (
                         <button
                           onClick={handleLogout}
-                          className={`${
-                            active ? "bg-gray-100" : ""
-                          } flex items-center gap-2 px-4 py-2 text-sm text-red-600 w-full text-left`}
+                          className={`${active ? "bg-gray-100" : ""
+                            } flex items-center gap-2 px-4 py-2 text-sm text-red-600 w-full text-left`}
                         >
                           <FontAwesomeIcon
                             icon={faSignOutAlt}
