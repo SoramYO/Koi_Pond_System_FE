@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
 import axiosInstance from "../../../axios/axiosInstance";
 import Loading from "../../../components/Loading";
-import { format, parseISO } from "date-fns";
+
 const { Title } = Typography;
 const ManagerUser = () => {
   const [users, setUsers] = useState([]);
@@ -64,7 +64,7 @@ const ManagerUser = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (record) => (
+      render: (status, record) => (
         <Switch
           checked={status === 'Active'}
           onChange={() => handleStatusChange(record._id)}

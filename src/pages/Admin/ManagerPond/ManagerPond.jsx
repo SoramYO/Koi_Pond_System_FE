@@ -3,7 +3,7 @@ import { Button, Col, Row, Space, Switch, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import Loading from "../../../components/Loading";
 import { format, parseISO } from "date-fns";
 const { Title } = Typography;
@@ -39,7 +39,7 @@ const ManagerPond = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.patch(`/pond-features/${id}/status`);
-      toast.success(response.data);
+      toast.success(response.data.message);
       fetchPonds();
     } catch (error) {
       toast.error("Failed to update status");
