@@ -29,6 +29,8 @@ import Introduction from "../pages/Introduction";
 import BlogList from './../pages/Blog/BlogList';
 import ManagerKoiFish from "../pages/Admin/ManagerKoiFish/ManagerKoiFish";
 import FishForm from "../pages/Admin/ManagerKoiFish/FishForm";
+import Billing from "../pages/Billing";
+import EditBlog from "../pages/Admin/EditBlog";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -92,6 +94,11 @@ export const routes = createBrowserRouter([
       {
         path: "/profile",
         element: <AccountProfile />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "billing",
+        element: <Billing />,
         errorElement: <ErrorPage />,
       },
       {
@@ -170,7 +177,7 @@ export const routes = createBrowserRouter([
       },
       {
         path: "edit-blog/:id",
-        element: <CreateBlog />,
+        element: <EditBlog />,
       },
       {
         path: "manager-pond",
