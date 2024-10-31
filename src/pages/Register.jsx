@@ -29,11 +29,9 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/register",
+        "http://localhost:5222/api/v1/authenticate/register",
         formData
       );
-      console.log(res.data);
-      
       toast.success(res.data.message);
       navigate("/");
     } catch (err) {
@@ -60,25 +58,75 @@ const RegisterPage = () => {
         </div>
         <div className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <InputField label="Email" name="email" onChange={handleChange} />
-            <InputField label="Mật Khẩu" name="password" type="password" onChange={handleChange} />
-            <InputField label="Tên" name="name" onChange={handleChange} />
-            <InputField label="Ngày Sinh" name="birth" type="date" onChange={handleChange} />
-            <div>
-              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-                Giới Tính
-              </label>
-              <select
-                id="gender"
-                name="gender"
+            <InputField
+              label="Tên Tài Khoản"
+              name="registerAccount.userName"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Mật Khẩu"
+              name="registerAccount.password"
+              type="password"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Xác Nhận Mật Khẩu"
+              name="registerAccount.confirmPassword"
+              type="password"
+              onChange={handleChange}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Họ"
+                name="registerUserProfile.lastName"
                 onChange={handleChange}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Chọn giới tính</option>
-                <option value="Male">Nam</option>
-                <option value="Female">Nữ</option>
-              </select>
+              />
+              <InputField
+                label="Tên"
+                name="registerUserProfile.firstName"
+                onChange={handleChange}
+              />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Email"
+                name="registerUserProfile.email"
+                type="email"
+                onChange={handleChange}
+              />
+              <InputField
+                label="Số Điện Thoại"
+                name="registerUserProfile.phone"
+                onChange={handleChange}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Ngày Sinh"
+                name="registerUserProfile.birthday"
+                type="date"
+                onChange={handleChange}
+              />
+              <div>
+                <label
+                  htmlFor="registerUserProfile.gender"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Giới Tính
+                </label>
+                <select
+                  id="registerUserProfile.gender"
+                  name="registerUserProfile.gender"
+                  onChange={handleChange}
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option value="">Chọn giới tính</option>
+                  <option value="Male">Nam</option>
+                  <option value="Female">Nữ</option>
+                </select>
+              </div>
+            </div>
+
             <div className="mt-6">
               <button
                 type="submit"
