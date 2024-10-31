@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../../Axios/axiosInstance";
 import Loading from "../../../components/Loading";
 import { format, parseISO } from "date-fns";
-
 const { Title } = Typography;
 
 const ManagerPond = () => {
@@ -23,6 +22,7 @@ const ManagerPond = () => {
     try {
       const response = await axiosInstance.get("/pond-features");
       setPonds(response.data.pondFeatures);
+
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching ponds:", error);
@@ -35,10 +35,10 @@ const ManagerPond = () => {
     navigate(`/admin/edit-pond/${id}`);
   };
 
-  const handleStatusChange = async (username) => {
+  const handleStatusChange = async (id) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.put(``);
+      const response = await axiosInstance.patch(`/pond-features/${id}/status`);
       toast.success(response.data);
       fetchPonds();
     } catch (error) {
@@ -78,7 +78,7 @@ const ManagerPond = () => {
     {
       title: "Status",
       key: "status",
-      render: (record) => (
+      render: (status, record) => (
         <Switch
           checked={record.status === "Active"}
           onChange={() => handleStatusChange(record._id)}
@@ -86,9 +86,9 @@ const ManagerPond = () => {
       ),
     },
     {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
+      title: "Action",
+      key: "action",
+      render: (record) => (
         <Space size="middle">
           <Button
             type="primary"

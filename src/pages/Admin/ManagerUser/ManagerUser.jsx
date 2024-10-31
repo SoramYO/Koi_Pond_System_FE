@@ -4,7 +4,8 @@ import { Button, Col, Row, Space, Switch, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../../Axios/axiosInstance";
+import { format, parseISO } from "date-fns";
+import axiosInstance from "../../../axios/axiosInstance";
 import Loading from "../../../components/Loading";
 import { format, parseISO } from "date-fns";
 const { Title } = Typography;
@@ -22,6 +23,7 @@ const ManagerUser = () => {
     try {
       const response = await axiosInstance.get("/users");
       setUsers(response.data.users);
+
     } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
@@ -33,8 +35,6 @@ const ManagerUser = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.patch(`/user/${id}/status`);
-      console.log(response);
-      
       toast.success(response.data.message);
       fetchUsers();
     } catch (error) {
@@ -47,7 +47,7 @@ const ManagerUser = () => {
   const columns = [
     { title: "Id", render: (_, __, index) => index + 1, key: "_id" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "First Name", dataIndex: "name", key: "name" },
+    { title: "Name", dataIndex: "name", key: "name" },
     {
       title: "Birthday",
       key: "birth",
@@ -66,7 +66,7 @@ const ManagerUser = () => {
       key: "status",
       render: (record) => (
         <Switch
-          checked={record.status === 'Active'}
+          checked={status === 'Active'}
           onChange={() => handleStatusChange(record._id)}
         />
       ),
@@ -74,11 +74,11 @@ const ManagerUser = () => {
     {
       title: "Action",
       key: "action",
-      render: (text, record) => (
+      render: (record) => (
         <Space size="middle">
           <Button
             icon={<EditOutlined />}
-            onClick={() => navigate(`/admin/edit-user/${record.id}`)}
+            onClick={() => navigate(`/admin/edit-user/${record._id}`)}
           >
             Edit
           </Button>
