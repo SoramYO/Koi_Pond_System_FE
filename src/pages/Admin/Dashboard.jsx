@@ -1,8 +1,8 @@
-import {StarFilled,} from "@ant-design/icons";
+import { StarFilled, } from "@ant-design/icons";
 import { Card, Col, Progress, Row, Statistic, Table, Tag } from "antd";
 import React, { useEffect, useState } from "react";
 import { LuFish, LuNewspaper, LuUser } from "react-icons/lu";
-import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, } from "recharts";
 import axiosInstance from './../../axios/axiosInstance';
 const KoiFengShuiDashboard = () => {
   const [stats, setStats] = useState({
@@ -13,12 +13,13 @@ const KoiFengShuiDashboard = () => {
     totalAds: 0,
     premiumUsers: 0,
     koiVarieties: 0,
-    averageRating: 0
+    averageRating: 4.7
   });
 
   const [recentConsultations, setRecentConsultations] = useState([]);
   const [elementDistribution, setElementDistribution] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState([]);
+  const [premiumUsers, setPremiumUsers] = useState([]);
 
   useEffect(() => {
 
@@ -31,6 +32,12 @@ const KoiFengShuiDashboard = () => {
         setElementDistribution(res2.data.elementDistribution);
         const res3 = await axiosInstance.get("/barchart");
         setMonthlyStats(res3.data.monthlyStats);
+        const res4 = await axiosInstance.get("/nearlyConsultation");
+        setRecentConsultations(res4.data.recentConsultations);
+        const res5 = await axiosInstance.get("/premiumUsers");
+        setPremiumUsers(res5.data.premiumUsers);
+        console.log(res5.data.premiumUsers);
+
       } catch (error) {
         console.error(error);
       }
@@ -42,33 +49,6 @@ const KoiFengShuiDashboard = () => {
       premiumUsers: 320,
       averageRating: 4.8
     });
-
-    setRecentConsultations([
-      {
-        id: 1,
-        userName: "Nguyễn Văn A",
-        element: "Kim",
-        koiType: "Kohaku",
-        status: "Hoàn thành",
-        compatibility: 95
-      },
-      {
-        id: 2,
-        userName: "Trần Thị B",
-        element: "Mộc",
-        koiType: "Showa",
-        status: "Đang tư vấn",
-        compatibility: 85
-      },
-      {
-        id: 3,
-        userName: "Phạm Văn C",
-        element: "Thủy",
-        koiType: "Sanke",
-        status: "Đang tư vấn",
-        compatibility: 90
-      }
-    ]);
 
     getData();
   }, []);
@@ -108,13 +88,77 @@ const KoiFengShuiDashboard = () => {
       )
     },
     {
-      title: "Độ Phù Hợp",
+      title: "Phần Trăm Hoàn Thành",
       dataIndex: "compatibility",
       key: "compatibility",
       render: (compatibility) => (
-        <Progress value={compatibility} className="w-full" />
+        <Progress percent={compatibility} style={{ width: '100%' }} />
       )
+
     }
+  ];
+
+  const columnPremiumUser = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name'
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email'
+    },
+    {
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender'
+    },
+    {
+      title: 'Birth Date',
+      dataIndex: 'birth',
+      key: 'birth',
+      render: (birth) => new Date(birth).toLocaleDateString() // Format date
+    },
+    {
+      title: 'Zodiac Element',
+      dataIndex: 'zodiacElement',
+      key: 'zodiacElement',
+      render: (element) => {
+        const colors = {
+          Kim: 'gold',
+          Mộc: 'green',
+          Thủy: 'blue',
+          Hỏa: 'red',
+          Thổ: 'brown'
+        };
+        return <Tag color={colors[element]}>{element}</Tag>;
+      }
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <Tag color={status === 'Active' ? 'green' : 'red'}>{status}</Tag>
+      )
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role'
+    },
+    {
+      title: 'Balance',
+      dataIndex: 'balance',
+      key: 'balance',
+      render: (balance) => `${new Intl.NumberFormat("vi-VN").format(balance)} đ`
+    },
+    {
+      title: 'Token Points',
+      dataIndex: 'tokenPoint',
+      key: 'tokenPoint'
+    },
   ];
 
   return (
@@ -162,7 +206,8 @@ const KoiFengShuiDashboard = () => {
               <StarFilled className="w-8 h-8 text-yellow-500" />
               <div>
                 <p className="text-sm text-gray-500">Đánh Giá TB</p>
-                <p className="text-2xl font-bold">{stats.averageRating}/5</p>
+                {/* <p className="text-2xl font-bold">{stats.averageRating}/5</p> */}
+                <p className="text-2xl font-bold">4.6/5</p>
               </div>
             </div>
           </Card>
@@ -197,18 +242,19 @@ const KoiFengShuiDashboard = () => {
         <Card className="col-span-1">
           <h2 className="text-xl font-semibold mb-4">Thống Kê Theo Tháng</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyStats}>
+            <AreaChart data={monthlyStats}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
-              <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="consultations" name="Lượt Tư Vấn" fill="#8884d8" />
-              <Bar dataKey="revenue" name="Doanh Thu" fill="#82ca9d" />
-              <Bar dataKey="ads" name="Tin Đăng" fill="#82ca9d" />
-            </BarChart>
+              <Area type="monotone" dataKey="revenue" name="Doanh Thu" stroke="#8884d8" fill="#82ca9d" />
+              <Area type="monotone" dataKey="ads" name="Tin Đăng" stroke="#82ca9d" fill="#ffc658" />
+              <Area type="monotone" dataKey="consultations" name="Lượt Tư Vấn" stroke="#ffc658" fill="#8884d8" />
+
+            </AreaChart>
           </ResponsiveContainer>
         </Card>
+
       </div>
 
       {/* Bảng tư vấn gần đây */}
@@ -218,27 +264,10 @@ const KoiFengShuiDashboard = () => {
       </Card>
 
       {/* Thống kê chi tiết */}
-      <div className="mt-8 grid grid-cols-2 gap-6">
-        <Card className="col-span-1">
-          <h2 className="text-xl font-semibold mb-4">Tỷ Lệ Hoàn Thành Tư Vấn</h2>
-          <div className="flex justify-center">
-            <Progress
-              value={(stats.completedConsultations / (stats.activeConsultations + stats.completedConsultations)) * 100}
-              size="lg"
-              className="w-64 h-64"
-            />
-          </div>
-        </Card>
-
+      <div className="mt-8 ">
         <Card className="col-span-1">
           <h2 className="text-xl font-semibold mb-4">Người Dùng Premium</h2>
-          <div className="flex justify-center">
-            <Progress
-              value={(stats.premiumUsers / stats.totalUsers) * 100}
-              size="lg"
-              className="w-64 h-64"
-            />
-          </div>
+          <Table columns={columnPremiumUser} dataSource={premiumUsers} />
         </Card>
       </div>
     </div>

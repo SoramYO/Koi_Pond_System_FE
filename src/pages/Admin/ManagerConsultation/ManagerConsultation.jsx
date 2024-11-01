@@ -165,7 +165,7 @@ const ManagerConsultation = () => {
                     <Button
                         type="primary"
                         onClick={() => handleStartConsultation(record._id, record.user.name)}
-                        disabled={record.status !== 'Đã nhận'}
+                        disabled={record.status == 'Từ chối' || record.status == 'Hủy' || record.status == 'Chưa nhận'}
                     >
                         Bắt đầu tư vấn
                     </Button>

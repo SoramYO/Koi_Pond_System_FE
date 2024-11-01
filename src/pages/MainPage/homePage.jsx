@@ -3,8 +3,10 @@ import React from "react";
 import { Card } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 
+
 const HomePage = () => {
   const navigate = useNavigate();
+
   const elements = [
     {
       name: "Kim",

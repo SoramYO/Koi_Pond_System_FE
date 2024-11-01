@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "../layout/AdminLayout";
 import CustomerLayout from "../layout/CustomerLayout";
-import Services from "../pages//servicesDisplay";
-import AccountProfile from "../pages/AccountProfile";
+import AccountProfile from "../pages/MainPage/AccountProfile";
 import CreateBlog from "../pages/Admin/ManagerBlog/CreateBlog ";
 import Dashboard from "../pages/Admin/Dashboard";
 import ManagerBlog from "../pages/Admin/ManagerBlog/ManagerBlog";
@@ -10,30 +9,39 @@ import PondForm from "../pages/Admin/ManagerPond/PondForm";
 import ManagerUser from "../pages/Admin/ManagerUser/ManagerUser";
 import UserForm from "../pages/Admin/ManagerUser/UserForm";
 import ChangePassword from "../pages/changePassword";
-import ChatWindow from "../pages/Chat/ChatWindow";
 import ErrorPage from "../pages/errorPage";
-import HomePage from "../pages/homePage";
-import Login from "../pages/login";
+import HomePage from "../pages/MainPage/homePage";
+import Login from "../pages/Authenticate/login";
 import CreateDirection from "../pages/Admin/CreateDirection";
 import Earth from "../pages/Elements/Earth";
 import Fire from "../pages/Elements/Fire";
 import Water from "../pages/Elements/Water";
 import Wood from "../pages/Elements/Wood";
-import Register from "../pages/Register";
+import Register from "../pages/Authenticate/Register";
 import ProtectedRoute from "./../config/ProtectedRoute";
 import ManagerPond from "./../pages/Admin/ManagerPond/ManagerPond";
 import BlogDetail from "./../pages/Blog/BlogDetail";
 import Metal from "./../pages/Elements/Metal";
-import FengShui from "./../pages/FengShui";
-import Introduction from "../pages/Introduction";
+import FengShui from "../pages/MainPage/FengShui";
+import Introduction from "../pages/MainPage/Introduction";
 import BlogList from './../pages/Blog/BlogList';
 import ManagerKoiFish from "../pages/Admin/ManagerKoiFish/ManagerKoiFish";
 import FishForm from "../pages/Admin/ManagerKoiFish/FishForm";
-import Billing from "../pages/Billing";
-import EditBlog from "../pages/Admin/EditBlog";
-import Consultation from "../pages/Consultation";
+import Billing from "../pages/Payment/Billing";
+import EditBlog from "../pages/Admin/ManagerBlog/EditBlog";
+import Consultation from "../pages/MainPage/Consultation";
 import ManagerConsultation from "../pages/Admin/ManagerConsultation/ManagerConsultation";
 import ChatPanel from "../components/ChatPanel";
+import PackageList from "../pages/Package/Package";
+import SuccessPage from "../pages/Payment/SuccessPage";
+import CancelPage from "../pages/Payment/CancelPage";
+import PackageDetail from "../pages/Package/PackageDetail";
+import ManagerPackage from "../pages/Admin/ManagerPackage/ManagerPackage";
+import PackageForm from "../pages/Admin/ManagerPackage/PackageForm";
+import UserConsultation from "../pages/MainPage/UserConsultation";
+import CustomerChatPanel from "../components/CustomerChatPanel";
+import CreateBlogUser from "../pages/Blog/CreateBlogUser";
+import EditBlogUser from "../pages/Blog/EditBlogUser";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -44,6 +52,28 @@ export const routes = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
+      {
+        path: "/package",
+        element: <PackageList />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/success",
+        element: <SuccessPage />,
+        errorElement: <ErrorPage />
+      }
+      ,
+      {
+        path: "/cancel",
+        element: <CancelPage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/package/:id",
+        element: <PackageDetail />,
+        errorElement: <ErrorPage />,
+      }
+      ,
       {
         path: "/feng-shui",
         element: <FengShui />,
@@ -58,6 +88,43 @@ export const routes = createBrowserRouter([
         ),
         errorElement: <ErrorPage />,
       },
+      {
+        path: "/contact",
+        element: (
+          <ProtectedRoute requiredRoles={["User"]}>
+            <UserConsultation />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/contact/:id",
+        element: (
+          <ProtectedRoute requiredRoles={["User"]}>
+            <CustomerChatPanel />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/create-blog",
+        element: (
+          <ProtectedRoute requiredRoles={["User"]}>
+            <CreateBlogUser />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/edit-blog/:id",
+        element: (
+          <ProtectedRoute requiredRoles={["User"]}>
+            <EditBlogUser />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+
       {
         path: "/blog",
         element: <BlogList />,
@@ -81,11 +148,6 @@ export const routes = createBrowserRouter([
       {
         path: "/forgot-password",
         element: <ChangePassword />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/services",
-        element: <Services />,
         errorElement: <ErrorPage />,
       },
       { path: "/introduction", element: <Introduction />, errorElement: <ErrorPage /> },
@@ -214,24 +276,18 @@ export const routes = createBrowserRouter([
         path: "consultation/:id",
         element: <ChatPanel />,
       },
-    ],
-  },
-  {
-    path: "/customer",
-    element: (
-      <ProtectedRoute requiredRoles={["User"]}>
-        <CustomerLayout />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />,
-    children: [
       {
-        path: "index",
-        element: <HomePage />,
+        path: "packages",
+        element: <ManagerPackage />,
       },
       {
-        path: "profile",
-        element: <AccountProfile />,
+        path: "add-package",
+        element: <PackageForm />,
+      }
+      ,
+      {
+        path: "edit-package/:id",
+        element: <PackageForm />,
       },
     ],
   },

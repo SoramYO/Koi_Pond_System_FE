@@ -3,10 +3,10 @@ import { Editor } from "@tinymce/tinymce-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import FormField from "../../components/FormField";
-import { storage } from "../../firebase/FirebaseConfig";
-import axiosInstance from "../../axios/axiosInstance";
-import Loading from "../../components/Loading";
+import FormField from "../../../components/FormField";
+import { storage } from "../../../firebase/FirebaseConfig";
+import axiosInstance from "../../../axios/axiosInstance";
+import Loading from "../../../components/Loading";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const EditBlog = () => {
@@ -56,7 +56,7 @@ const EditBlog = () => {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { _id, title, content, image, tags } = formData;
@@ -262,7 +262,7 @@ const EditBlog = () => {
             type="submit"
             className="inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-             Save
+            Save
           </button>
         </div>
       </form>

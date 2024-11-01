@@ -1,11 +1,13 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Loading from "../../components/Loading";
+import { AuthContext } from "../../context/authContext";
 
 const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useContext(AuthContext);
   useEffect(() => {
     setLoading(true);
     const fetchBlogs = async () => {
@@ -31,9 +33,18 @@ const BlogList = () => {
       <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
         Blog List
       </h2>
+      {user && ( 
+        <Link
+          to="/create-blog"
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg inline-block mb-4"
+        >
+          Create Blog
+        </Link>
+
+      )}
       {blogs.length === 0 ? (
         <p className="text-center text-gray-600">
-          No blogs found. Create a new one!
+          No blogs found.
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

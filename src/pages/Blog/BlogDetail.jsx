@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "./../../components/Loading";
 import axios from "axios";
+import { format } from "date-fns";
+import { UserAddOutlined } from "@ant-design/icons";
 const BlogDetail = () => {
   const { id } = useParams(); // Retrieve id from URL
   const [blog, setBlog] = useState(null);
@@ -40,6 +42,14 @@ const BlogDetail = () => {
       >
         {blog.title}
       </h4>
+      <div className="entry-meta">
+        <span>
+          {format(new Date(blog.createdAt), 'dd MMMM yyyy, HH:mm')}
+        </span>
+        <span className="ml-5 ">
+          <UserAddOutlined /> {blog.user_id.name}
+        </span>
+      </div>
       {blog &&
         blog?.tags.map((tag, index) => (
           <>

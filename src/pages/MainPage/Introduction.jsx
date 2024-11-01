@@ -10,10 +10,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
+
 const { Title, Paragraph } = Typography;
 
 const Introduction = () => {
     const navigate = useNavigate();
+    
     const features = [
         {
             icon: <FontAwesomeIcon icon={faCompass} className="text-4xl text-blue-600" />,

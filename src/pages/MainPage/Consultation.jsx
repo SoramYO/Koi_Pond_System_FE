@@ -12,11 +12,14 @@ import {
     MessageOutlined,
     TeamOutlined
 } from '@ant-design/icons';
-import ConsultationModal from '../components/ConsultationModal';
+import ConsultationModal from '../../components/ConsultationModal';
+
 
 const { Title, Paragraph, Text } = Typography;
 
 const ConsultationPage = () => {
+    
+
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const showModal = () => {

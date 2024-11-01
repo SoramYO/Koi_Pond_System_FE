@@ -55,7 +55,6 @@ const FishForm = () => {
         try {
             setLoading(true);
             const response = await axiosInstance.get(`/get-koi-by-id/${id}`);
-            console.log(response.data.koiFishBreed);
             const fishData = response.data.koiFishBreed;
             form.setFieldsValue({
                 name: fishData.name,
@@ -63,6 +62,7 @@ const FishForm = () => {
                 image_url: fishData.image_url,
                 zodiac_element: fishData.zodiac_element._id
             });
+            console.log("Fish data:", fishData);
 
             // If there's an existing image, add it to fileList
             if (fishData.image_url) {

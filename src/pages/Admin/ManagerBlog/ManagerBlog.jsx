@@ -80,7 +80,7 @@ const ManagerBlog = () => {
                 />
                 <Button
                   icon={<EditOutlined />}
-                  onClick={() => handleEdit(blog.id)}
+                  onClick={() => handleEdit(blog._id)}
                 >
                   Edit
                 </Button>

@@ -57,7 +57,7 @@ const UserForm = () => {
           name: user.name,
           gender: user.gender,
           birthday: birthdayMoment,
-          status: user.status ?? true,
+          status: user.status ? "Active" : "Inactive",
           roleName: user.role
         };
         setFormData(userData);
