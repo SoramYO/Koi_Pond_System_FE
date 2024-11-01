@@ -9,8 +9,9 @@ import { getDatabase, onValue, push, ref, set } from "firebase/database";
 import React, { useEffect, useRef, useState } from "react";
 import parse from 'html-react-parser';
 import { useLocation, useParams } from "react-router-dom";
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import axiosInstance from "../axios/axiosInstance";
+import { toast } from "react-toastify";
 const ChatPanel = () => {
   const { id } = useParams();
   const location = useLocation();
@@ -18,12 +19,12 @@ const ChatPanel = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [completionStatus, setCompletionStatus] = useState({
     staff: false,
     customer: false
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const db = getDatabase();
@@ -31,6 +32,33 @@ const ChatPanel = () => {
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const checkLastMessageForCompletion = (messages) => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.sender !== "Staff" && lastMessage.sender !== "System") {
+        const isCompletionMessage = lastMessage.message.trim().toLowerCase() === "hoàn thành";
+        setCompletionStatus(prev => ({
+          ...prev,
+          customer: true
+        }));
+      }
+    }
+  };
+
+  const handleCompleteConsultation = async () => {
+    try {
+      setLoading(true);
+      let status = 'Hoàn thành';
+      const res = await axiosInstance.patch(`/consultations/${id}/status`, { status });
+      toast.success(`Consultation completed successfully`);
+      setLoading(false);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error completing consultation:", error);
+      toast.error("Failed to complete consultation");
     }
   };
 
@@ -52,6 +80,7 @@ const ChatPanel = () => {
             }))
             .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
           setMessages(messagesArray);
+          checkLastMessageForCompletion(messagesArray);
           if (messagesArray.length > 0) {
             const lastMessage = messagesArray[messagesArray.length - 1].message;
             if (lastMessage.trim().toLowerCase() === "hoàn thành") {
@@ -66,7 +95,10 @@ const ChatPanel = () => {
       const completionUnsubscribe = onValue(completionRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          setCompletionStatus(data);
+          setCompletionStatus(prev => ({
+            ...prev,
+            ...data
+          }));
         }
       });
 
@@ -177,8 +209,8 @@ const ChatPanel = () => {
         <Button
           onClick={handleComplete}
           variant="outline"
-          className={`bg-green-50 text-green-600 hover:bg-green-100 ${completionStatus.customer ? '' : 'opacity-50 cursor-not-allowed'}`}
-          disabled={completionStatus.customer}
+          className={`bg-green-50 text-green-600 hover:bg-green-100 ${!completionStatus.customer ? '' : 'opacity-50 cursor-not-allowed'}`}
+          disabled={!completionStatus.customer}
         >
           Hoàn thành tư vấn
         </Button>
@@ -284,6 +316,13 @@ const ChatPanel = () => {
           </button>
         </div>
       </form>
+      <Modal
+        title="Hoàn thành tư vấn"
+        visible={isModalOpen}
+        onOk={handleCompleteConsultation}
+        onCancel={() => setIsModalOpen(false)}>
+        <p>Xác nhận hoàn thành tư vấn với khách hàng?</p>
+      </Modal>
     </div>
   );
 };

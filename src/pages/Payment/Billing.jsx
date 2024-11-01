@@ -1,20 +1,16 @@
-import { EditOutlined, UserAddOutlined } from "@ant-design/icons";
-import { Button, Col, Row, Space, Switch, Table, Tag, Typography } from "antd";
-
+import {  Col, Row, Table, Tag, Typography } from "antd";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, parseISO } from "date-fns";
-import axiosInstance from "../axios/axiosInstance";
-import Loading from "../components/Loading";
-import { data } from "autoprefixer";
-import { render } from "react-dom";
+import axiosInstance from "../../axios/axiosInstance";
+import Loading from "../../components/Loading";
+
 
 const { Title } = Typography;
 const Billing = () => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchTransactions();
@@ -24,8 +20,8 @@ const Billing = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.get("/my-transaction");
-      
-      setTransactions(response.data);
+
+      setTransactions(response.data.transactions);
     } catch (error) {
       toast.error("Failed to fetch users");
     } finally {
@@ -55,7 +51,7 @@ const Billing = () => {
       render: (status) => {
         let color;
         let text;
-  
+
         // Determine the color and text based on the status
         if (status === "Pending") {
           color = "yellow";
@@ -67,7 +63,7 @@ const Billing = () => {
           color = "red";
           text = status; // Default to showing the status text
         }
-  
+
         return <Tag color={color}>{text}</Tag>; // Render a Tag component
       },
     }

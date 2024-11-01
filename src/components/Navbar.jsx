@@ -13,6 +13,7 @@ import {
   faCreditCard,
   faSignOutAlt,
   faHeadset,
+  faRectangleAd,
 } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../context/authContext";
 import logo from "../assets/images/logo.webp";
@@ -45,6 +46,7 @@ const Navbar = () => {
     { label: "Feng Shui", to: "/feng-shui", icon: faCompass },
     { label: "Contact", to: "/contact", icon: faHeadset },
     { label: "Blog", to: "/blog", icon: faBlog },
+    { label: "Package", to: "/package", icon: faRectangleAd }
   ];
 
   return (

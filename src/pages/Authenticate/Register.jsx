@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Loading from "../components/Loading";
+import Loading from "../../components/Loading";
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,7 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5222/api/v1/authenticate/register",
+        "http://localhost:8080/api/v1/register",
         formData
       );
       toast.success(res.data.message);

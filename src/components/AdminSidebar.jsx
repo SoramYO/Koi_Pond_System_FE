@@ -10,14 +10,12 @@ import { FaHeadphonesAlt, FaHeadset } from "react-icons/fa";
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
-  const handleLogout = async () => {
+  const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
-    const res = await axios.post(
-      "http://localhost:5222/api/v1/authenticate/logout"
-    );
+    localStorage.removeItem("user");
     localStorage.removeItem("access_token");
-    toast.success(res.data.message);
-    navigate("/login");
+    sessionStorage.removeItem("user");
+    toast.success("Đăng xuất thành công");
   };
 
   return (
@@ -71,6 +69,14 @@ const AdminSidebar = () => {
         >
           <FiFileText className="mr-2" /> {/* Blog icon */}
           Blog
+        </a>
+        {/* Package link */}
+        <a
+          href="/admin/packages"
+          className="flex items-center py-2 px-4 text-gray-600 hover:bg-gray-200"
+        >
+          <FiFileText className="mr-2" /> {/* Blog icon */}
+          Package
         </a>
       </nav>
 
