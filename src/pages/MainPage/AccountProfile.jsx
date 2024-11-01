@@ -121,7 +121,7 @@ const BlogList = () => {
           {blogs.map((blog) => (
             <Link
               key={blog._id}
-              to={`/blog/${blog._id}`} // This is correct
+              to={`/edit-blog/${blog._id}`} 
               className="border p-4 rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
             >
               <div className="flex flex-col">
