@@ -27,7 +27,10 @@ const EditBlogUser = () => {
     const fetchData = async () => {
       try {
         const res = await axiosInstance.get(`/blog/${id}`);
-        setFormData(res.data.advertisement);
+        setFormData({
+          ...res.data.advertisement,
+          imagePreview: res.data.advertisement.image
+        });
       } catch (error) {
         console.error("Error fetching blog: ", error);
       } finally {
@@ -35,7 +38,7 @@ const EditBlogUser = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -60,13 +63,18 @@ const EditBlogUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { _id, title, content, image, tags } = formData;
-    if ((title && content && image && tags) || imagePreview) {
+    if (title && content) {
       try {
         setLoading(true);
-        let imageUrlToSave = "";
-        const storageRef = ref(storage, `images/${image.name}`);
-        const snapshot = await uploadBytes(storageRef, image);
-        imageUrlToSave = await getDownloadURL(snapshot.ref);
+        let imageUrlToSave = formData.image; // Giữ nguyên link ảnh cũ nếu không upload mới
+
+        // Chỉ upload ảnh mới nếu có file ảnh được chọn
+        if (image && image instanceof File) {
+          const storageRef = ref(storage, `images/${image.name}`);
+          const snapshot = await uploadBytes(storageRef, image);
+          imageUrlToSave = await getDownloadURL(snapshot.ref);
+        }
+
         const blogData = {
           title: formData.title,
           content: formData.content,
@@ -77,13 +85,13 @@ const EditBlogUser = () => {
         toast.success(res.data.message);
         setLoading(false);
 
-        navigate("/admin/blogs");
+        navigate(`/blog/${_id}`);
       } catch (error) {
         console.error("Error adding document: ", error);
         toast.error("Error saving blog. Please try again.");
       }
     } else {
-      toast.error("Please fill in all fields and upload an image.");
+      toast.error("Please fill in title and content fields.");
     }
   };
 
@@ -249,7 +257,7 @@ const EditBlogUser = () => {
             <div className="mt-4">
               <p className="text-sm text-gray-500">Image Preview:</p>
               <img
-                src={formData.imagePreview ? formData.imagePreview : formData.image}
+                src={formData.imagePreview || formData.image}
                 alt="Selected"
                 className="mt-2 w-full h-64 object-cover rounded-lg shadow-md"
               />
